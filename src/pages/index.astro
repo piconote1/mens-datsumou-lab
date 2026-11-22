@@ -21,10 +21,10 @@ const homeImage = `${Astro.url.origin}/brand/og-default.png`;
 type Group = { slug: string; title: string; featured?: boolean; pinned: string[] };
 // 記事ができたら、pinned に slug を並べる（見出しの名前と slug は、管理画面のカテゴリーと同じにする）。
 const GROUPS: Group[] = [
-	{ slug: "select", title: "脱毛を選ぶ", featured: true, pinned: [] },
+	{ slug: "select", title: "脱毛を選ぶ", featured: true, pinned: ["clinic-selection-guide"] },
 	{ slug: "region", title: "地域で選ぶ", featured: true, pinned: [] },
-	{ slug: "basic", title: "基礎を知る", pinned: [] },
-	{ slug: "money", title: "お金と契約", pinned: [] },
+	{ slug: "basic", title: "基礎を知る", pinned: ["clinic-vs-salon-guide", "machine-guide"] },
+	{ slug: "money", title: "お金と契約", pinned: ["contract-cancel-guide", "payment-guide"] },
 	{ slug: "visit", title: "通う・受ける", pinned: [] },
 	{ slug: "faq", title: "よくある質問", pinned: [] },
 ];
@@ -91,12 +91,6 @@ const labelsOf = (id: string) =>
 							<p>
 								メンズ脱毛研究室は、公式に公開されている情報をもとに、メンズ医療脱毛・ヒゲ脱毛クリニックの料金・脱毛機・条件を並べて比べるサイトです。選び方の基本から、地域別の比較、料金と契約の見方まで、記事ごとに整理しています。
 							</p>
-							<ul class="home-intro__links">
-								<li><a href="/category/select">クリニックを選ぶ</a></li>
-								<li><a href="/category/region">地域で選ぶ</a></li>
-								<li><a href="/category/money">料金と契約を知る</a></li>
-								<li><a href="/category/faq">よくある質問</a></li>
-							</ul>
 						</div>
 						{groups.map((g) => (
 							<section class="home-group" aria-label={g.title}>
@@ -224,27 +218,6 @@ const labelsOf = (id: string) =>
 		font-size: 0.9375rem;
 		line-height: 1.85;
 		color: #374151;
-	}
-	.home-intro__links {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem 0.75rem;
-		margin: 0.9rem 0 0;
-		padding: 0;
-		list-style: none;
-	}
-	.home-intro__links a {
-		display: inline-block;
-		padding: 0.5rem 1rem;
-		border: 1px solid #cfd6de;
-		border-radius: 999px;
-		background: #fff;
-		color: #1f2933;
-		font-size: 0.875rem;
-		text-decoration: none;
-	}
-	.home-intro__links a:hover {
-		background: #f3f5f8;
 	}
 </style>
 

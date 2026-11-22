@@ -466,9 +466,9 @@ footer.site-footer[class] .site-footer__widgets { display: none; }
 .btn--readmore:hover { background: var(--gray-bar); color: #fff; border-color: var(--gray-bar); }
 
 
-/* ヘッダーのサイトロゴ画像（2サイト共通: 幅で大きさをそろえる。パソコン250px、スマホ190px） */
-.brand__logo-img { display: block; height: auto; width: 250px; max-width: 100%; }
-@media (max-width: 600px) { .brand__logo-img { width: 190px; } }
+/* ヘッダーのサイトロゴ画像。まいかのロゴと、文字の大きさ（漢字の高さ約40px）・上下の位置をそろえる。幅は文字数が違うので、そろえない（パソコン333px、スマホ250px）。枠は縦中央にそろえる */
+.brand__logo-img { display: block; height: auto; width: 333px; max-width: 100%; }
+@media (max-width: 600px) { .brand__logo-img { width: 250px; } }
 
 /* 管理画面でサイトロゴを設定した場合も、同じ大きさで表示する */
 header.site-header .brand .brand__logo[class] { height: auto; width: 250px; max-width: none; }
@@ -693,7 +693,7 @@ article.post .post-hero .frame[class] { width: 100%; max-width: none; margin: 0;
 article.post .post-hero__media[class], article.post .post-hero__media[class] img { width: 100%; max-width: none; }
 
 /* サイトロゴ: 画像の余白を切り落として、文字部分を大きく見せる */
-header.site-header .brand[class] { display: block; height: 64px; overflow: hidden; }
+header.site-header .brand[class] { display: flex; align-items: center; height: 64px; overflow: hidden; }
 header.site-header .brand .brand__logo[class] { height: 104px; width: auto; max-width: none; margin-top: -20px; }
 @media (max-width: 600px) {
 	header.site-header .brand[class] { height: 48px; }
