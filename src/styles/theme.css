@@ -467,12 +467,12 @@ footer.site-footer[class] .site-footer__widgets { display: none; }
 
 
 /* ヘッダーのサイトロゴ画像 */
-.brand__logo-img { display: block; height: 56px; width: auto; }
-@media (max-width: 600px) { .brand__logo-img { height: 44px; } }
+.brand__logo-img { display: block; height: 64px; width: auto; }
+@media (max-width: 600px) { .brand__logo-img { height: 48px; } }
 
 /* 管理画面でサイトロゴを設定した場合も、同じ大きさで表示する */
-header.site-header .brand .brand__logo[class] { height: 56px; width: auto; max-width: none; }
-@media (max-width: 600px) { header.site-header .brand .brand__logo[class] { height: 44px; } }
+header.site-header .brand .brand__logo[class] { height: 64px; width: auto; max-width: none; }
+@media (max-width: 600px) { header.site-header .brand .brand__logo[class] { height: 48px; } }
 
 /* ---- 記事ページ: マナブログ風（グレー背景に白いカード／見出し） ---- */
 article.post {

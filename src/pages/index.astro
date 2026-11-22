@@ -19,8 +19,15 @@ const homeImage = `${Astro.url.origin}/brand/og-default.png`;
 // 固定にしていない記事は、トップには出ない（各見出しの「すべて見る」ボタンから、カテゴリーのページで読める）。
 // 分類はカテゴリー1本だけ。見出しの名前と slug は、管理画面のカテゴリーと同じにする。
 type Group = { slug: string; title: string; featured?: boolean; pinned: string[] };
-// 記事ができたら、ここにカテゴリーごとの固定記事を並べる（カテゴリーの slug は管理画面と同じにする）。
-const GROUPS: Group[] = [];
+// 記事ができたら、pinned に slug を並べる（見出しの名前と slug は、管理画面のカテゴリーと同じにする）。
+const GROUPS: Group[] = [
+	{ slug: "select", title: "脱毛を選ぶ", featured: true, pinned: [] },
+	{ slug: "region", title: "地域で選ぶ", featured: true, pinned: [] },
+	{ slug: "basic", title: "基礎を知る", pinned: [] },
+	{ slug: "money", title: "お金と契約", pinned: [] },
+	{ slug: "visit", title: "通う・受ける", pinned: [] },
+	{ slug: "faq", title: "よくある質問", pinned: [] },
+];
 
 const fetchEntry = async (slug: string) => {
 	try {
@@ -50,6 +57,18 @@ const labelsOf = (id: string) =>
 ---
 
 <Base title={siteTitle} description={HOME_DESCRIPTION} canonical={homeCanonical} image={homeImage}>
+	<section class="band hero" aria-roledescription="carousel" aria-label="医療脱毛クリニックのイメージ" data-hero>
+		<div class="hero__wrap">
+			<div class="hero__stage">
+				<img class="hero__img is-active" src="/hero/hero-1.webp" srcset="/hero/hero-1-640.webp 640w, /hero/hero-1-960.webp 960w, /hero/hero-1-1280.webp 1280w, /hero/hero-1.webp 1672w" sizes="100vw" alt="医療クリニックの受付" width="1600" height="900" fetchpriority="high" decoding="async" />
+				<img class="hero__img hero__img--machine" src="/hero/hero-2.webp" srcset="/hero/hero-2-640.webp 640w, /hero/hero-2-960.webp 960w, /hero/hero-2-1280.webp 1280w, /hero/hero-2.webp 1536w" sizes="100vw" alt="医療脱毛の施術室と脱毛機" width="1600" height="1067" decoding="async" />
+				<div class="hero__dots" role="group" aria-label="表示する画像を選ぶ">
+					<button type="button" class="hero__dot is-active" aria-label="1枚目を表示" aria-current="true"></button>
+					<button type="button" class="hero__dot" aria-label="2枚目を表示"></button>
+				</div>
+			</div>
+		</div>
+	</section>
 	{
 		groups.length === 0 ? (
 			<section class="band section">
@@ -110,6 +129,91 @@ const labelsOf = (id: string) =>
 </Base>
 
 <style>
+	.hero {
+		/* 写真のまわりに白い余白を残す（左右・上・下）。下の余白で、1画面目の終わりが分かる */
+		padding: 20px clamp(16px, 2.4vw, 48px) 0;
+	}
+	.hero__wrap {
+		width: 100%;
+	}
+	.hero__stage {
+		position: relative;
+		overflow: hidden;
+		/* 1画面目いっぱいに写真を出す（ヘッダー分を引いた高さ） */
+		border-radius: 16px;
+		height: calc(100vh - 130px - 20px - 64px);
+		height: calc(100svh - 130px - 20px - 64px);
+		min-height: 320px;
+		max-height: 900px;
+		background: #eef1f4;
+	}
+	.hero__img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center;
+		opacity: 0;
+		transition: opacity 1.2s ease;
+	}
+	.hero__img--machine {
+		object-position: 72% 50%;
+	}
+	.hero__img:not(.hero__img--machine) {
+		object-position: 62% 50%;
+	}
+	.hero__img.is-active {
+		opacity: 1;
+	}
+	.hero__dots {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 12px;
+		display: flex;
+		justify-content: center;
+		gap: 10px;
+	}
+	.hero__dot {
+		position: relative;
+		width: 10px;
+		height: 10px;
+		padding: 0;
+		border: 0;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.65);
+		box-shadow: 0 0 0 1px rgba(31, 41, 51, 0.25);
+		cursor: pointer;
+	}
+	/* 見た目は小さいまま、押せる範囲を 44px 四方にする */
+	.hero__dot::after {
+		content: "";
+		position: absolute;
+		inset: -17px;
+	}
+	.hero__dot.is-active {
+		background: #1f2933;
+		box-shadow: 0 0 0 1px #fff;
+	}
+	@media (max-width: 640px) {
+		.hero {
+			padding-top: 12px;
+		}
+		.hero__stage {
+			border-radius: 12px;
+			height: calc(100svh - 150px - 12px - 48px);
+			min-height: 300px;
+		}
+		.hero__img:not(.hero__img--machine) {
+			object-position: 88% 50%;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.hero__img {
+			transition: none;
+		}
+	}
 	.home-intro {
 		margin-bottom: 1.6rem;
 		padding-bottom: 1.4rem;
@@ -143,3 +247,38 @@ const labelsOf = (id: string) =>
 		background: #f3f5f8;
 	}
 </style>
+
+<script>
+	// 画像を5秒ごとに切り替える。点を押すと、その画像を表示する。マウスを乗せている間・動きを減らす設定のときは、自動で切り替えない（スマホの操作では止めない）。
+	const root = document.querySelector<HTMLElement>("[data-hero]");
+	if (root) {
+		const imgs = Array.from(root.querySelectorAll<HTMLImageElement>(".hero__img"));
+		const dots = Array.from(root.querySelectorAll<HTMLButtonElement>(".hero__dot"));
+		let cur = 0;
+		let paused = false;
+		const show = (i: number) => {
+			cur = (i + imgs.length) % imgs.length;
+			imgs.forEach((el, k) => el.classList.toggle("is-active", k === cur));
+			dots.forEach((el, k) => {
+				el.classList.toggle("is-active", k === cur);
+				if (k === cur) el.setAttribute("aria-current", "true");
+				else el.removeAttribute("aria-current");
+			});
+		};
+		imgs.forEach((el) => el.removeAttribute("loading"));
+		dots.forEach((el, k) => el.addEventListener("click", () => show(k)));
+		// マウスを乗せている間だけ止める。スマホ（タッチ）では、触れても止めない
+		root.addEventListener("pointerenter", (e) => {
+			if (e.pointerType === "mouse") paused = true;
+		});
+		root.addEventListener("pointerleave", (e) => {
+			if (e.pointerType === "mouse") paused = false;
+		});
+		const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		if (!reduce && imgs.length > 1) {
+			setInterval(() => {
+				if (!paused && !document.hidden) show(cur + 1);
+			}, 5000);
+		}
+	}
+</script>
