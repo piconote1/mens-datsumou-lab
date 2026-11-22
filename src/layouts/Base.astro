@@ -149,8 +149,8 @@ const lang = getSiteLocale() ?? "ja";
 const SHOW_PR_NOTICE = false;
 const monogram = [...siteTitle.trim()][0]?.toUpperCase() ?? "";
 const year = new Date().getFullYear();
-// GA4 の計測ID。メンズ用のプロパティを作ったら、ここに入れる（空のあいだは、計測のスクリプトを出さない）。
-const GA_ID = "";
+// GA4 の計測ID（メンズ用のプロパティ。空にすると、計測のスクリプトを出さない）。
+const GA_ID = "G-ZN27GERM2B";
 ---
 
 <!doctype html>
@@ -158,6 +158,7 @@ const GA_ID = "";
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="google-site-verification" content="mHDc0_embyoc7nvja_NhY7UHWX99zCXflt9TSVO6z98" />
 		<!-- Google アナリティクス（GA4） -->
 		{
 			GA_ID && (

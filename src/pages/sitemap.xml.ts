@@ -13,12 +13,17 @@ const iso = (d?: Date | string | null) => {
 	return Number.isNaN(t.getTime()) ? null : t.toISOString().replace(/\.\d{3}Z$/, "Z");
 };
 
-async function latest(collection: "posts" | "pages"): Promise<string | null> {
+// 公開済みの項目があるか（exists）と、最新の更新日（lastmod）。項目が0件のコレクションは、
+// EmDash 本体の一覧が 404 を返すので、目次に載せない（載せると、検索エンジンが「取得できない」と扱う）。
+async function latest(collection: "posts" | "pages"): Promise<{ exists: boolean; lastmod: string | null }> {
 	try {
 		const { entries } = await getEmDashCollection(collection, { orderBy: { updated_at: "desc" }, limit: 1 });
-		return iso((entries[0]?.data as { updatedAt?: Date } | undefined)?.updatedAt);
+		return {
+			exists: entries.length > 0,
+			lastmod: iso((entries[0]?.data as { updatedAt?: Date } | undefined)?.updatedAt),
+		};
 	} catch {
-		return null;
+		return { exists: false, lastmod: null };
 	}
 }
 
@@ -29,9 +34,9 @@ export const GET: APIRoute = async ({ url }) => {
 	const now = iso(new Date())!;
 	// カテゴリーの一覧は、記事の更新で変わるので、記事の最新の更新日を使う
 	const items = [
-		{ name: "posts", lastmod: posts ?? now },
-		{ name: "pages", lastmod: pages ?? now },
-		{ name: "categories", lastmod: posts ?? now },
+		...(posts.exists ? [{ name: "posts", lastmod: posts.lastmod ?? now }] : []),
+		...(pages.exists ? [{ name: "pages", lastmod: pages.lastmod ?? now }] : []),
+		{ name: "categories", lastmod: posts.lastmod ?? pages.lastmod ?? now },
 	];
 	const lines = ['<?xml version="1.0" encoding="UTF-8"?>', '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
 	for (const i of items) {
