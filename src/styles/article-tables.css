@@ -15,8 +15,8 @@
 .dt-root tr.dt-price td{background:#fff}
 .dt-root tr.dt-point td{font-size:13px;color:#33404c}
 .dt-root .dt-btnrow td{text-align:center;vertical-align:middle}
-.dt-root td a.dt-btn{position:relative;display:block;padding:11px 30px 11px 14px;border-radius:999px;background:#90d6a2;color:#17402a;text-decoration:none;font-weight:700;font-size:14px;text-align:center;line-height:1.45;box-shadow:0 4px 0 #62b077;top:0}
-.dt-root td a.dt-btn:hover{top:2px;box-shadow:0 2px 0 #62b077}
+.dt-root td a.dt-btn{position:relative;display:block;padding:11px 30px 11px 14px;border-radius:999px;background:#8ed3f2;color:#10304a;text-decoration:none;font-weight:700;font-size:14px;text-align:center;line-height:1.45;box-shadow:0 4px 0 #4fa8d6;top:0}
+.dt-root td a.dt-btn:hover{top:2px;box-shadow:0 2px 0 #4fa8d6}
 .dt-root td a.dt-btn span{display:block}
 .dt-root td a.dt-btn .dt-ch{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:22px;line-height:1}
 .dt-root .dt-note{margin:8px 2px 0;font-size:12px;color:#5b6773;line-height:1.6}
@@ -36,8 +36,8 @@
 .dt-root thead th:first-child{position:sticky;left:0;z-index:3;box-shadow:1px 0 0 #d9dee4}
 .dt-root thead th:first-child,.dt-root tbody tr>th:first-child,.dt-root th.dt-corner,.dt-root th.dt-corner2{width:44px;min-width:44px;max-width:44px;padding:6px 3px;font-size:11px;line-height:1.35;word-break:break-all}
 .dt-root .dt-row{display:flex;flex-direction:column;gap:16px}
-.dt-root .dt-row a.dt-btn{position:relative;display:block;width:100%;padding:16px 56px;border-radius:999px;background:#90d6a2;color:#17402a;text-decoration:none;font-weight:700;font-size:17px;text-align:center;line-height:1.45;box-shadow:0 4px 0 #62b077;top:0}
-.dt-root .dt-row a.dt-btn:hover{top:2px;box-shadow:0 2px 0 #62b077}
+.dt-root .dt-row a.dt-btn{position:relative;display:block;width:100%;padding:16px 56px;border-radius:999px;background:#8ed3f2;color:#10304a;text-decoration:none;font-weight:700;font-size:17px;text-align:center;line-height:1.45;box-shadow:0 4px 0 #4fa8d6;top:0}
+.dt-root .dt-row a.dt-btn:hover{top:2px;box-shadow:0 2px 0 #4fa8d6}
 .dt-root .dt-row a.dt-btn .dt-ch{position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:26px;line-height:1}
 .dt-root .dt-row a.dt-btn span{display:block}
 .dt-root .dt-row a.dt-btn .dt-ch{display:block}

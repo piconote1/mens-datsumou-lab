@@ -16,7 +16,7 @@
 	--color-surface: light-dark(#ffffff, #162540);
 	--color-fill: light-dark(#f3f6f9, #1f3150);
 	--color-fill-strong: light-dark(#e6ecf2, #2a4166);
-	--color-text: light-dark(#172641, #eaf4f1);
+	--color-text: light-dark(#172641, #eaf3fa);
 	--color-text-secondary: light-dark(#3a4862, #b9c7d6);
 	--color-muted: light-dark(#566480, #93a4b8);
 	--color-border: light-dark(#dde5ec, #26385a);
@@ -526,15 +526,15 @@ article.post .prose h3 {
 article.post .prose h3::before {
 	content: "\2714";
 	margin-right: 0.45em;
-	color: #4cc3a0;
+	color: #3ba5e0;
 }
 /* 記事の先頭の「この記事で分かること」ボックス（見出し3＋箇条書き） */
 article.post .prose > h3:first-child { margin-top: 0; }
 article.post .prose > h3:first-child + ul {
 	margin: 0 0 2rem;
 	padding: 1.5rem 1.5rem 1.5rem 2.75rem;
-	background: #f6fcfa;
-	border: 1px dashed #4cc3a0;
+	background: #f4faff;
+	border: 1px dashed #3ba5e0;
 }
 article.post .prose > h3:first-child + ul li { margin: 0.5rem 0; }
 article.post .post-main[class] { max-width: none; width: 100%; margin: 0; }
@@ -555,13 +555,13 @@ article.post nav.toc h2.eyebrow[class] {
 article.post nav.toc h2.eyebrow[class]::before {
 	content: "\2714";
 	margin-right: 0.45em;
-	color: #4cc3a0;
+	color: #3ba5e0;
 }
 article.post nav.toc .toc__list[class] {
 	margin: 0 0 2rem;
 	padding: 1.5rem 1.5rem 1.5rem 2.75rem;
-	background: #f6fcfa;
-	border: 1px dashed #4cc3a0;
+	background: #f4faff;
+	border: 1px dashed #3ba5e0;
 	list-style: disc;
 }
 article.post nav.toc .toc__item[class] { margin: 0.6rem 0; padding: 0; border: 0; }
@@ -575,7 +575,7 @@ article.post nav.toc .toc__link[class][href] {
 	font-weight: 500;
 	text-decoration: none;
 }
-article.post nav.toc .toc__link[class][href]:hover { color: #1f9e7c; text-decoration: underline; }
+article.post nav.toc .toc__link[class][href]:hover { color: #1a78b8; text-decoration: underline; }
 article.post nav.toc .toc__link[class][href][aria-current] { color: var(--color-text); font-weight: 500; }
 article.post .post-rail[class] { display: block; width: 100%; position: static; }
 article.post nav.toc[class] { display: block; }
@@ -603,7 +603,7 @@ article.post .post-header__tags .chip[class] {
 	background: transparent;
 	border: 0;
 	border-radius: 0;
-	color: #1f9e7c;
+	color: #1a78b8;
 	font-size: var(--font-size-base);
 	letter-spacing: 0.04em;
 }
@@ -648,7 +648,7 @@ article.post .prose h4 {
 article.post .prose h4::before {
 	content: "\2714";
 	margin-right: 0.45em;
-	color: #4cc3a0;
+	color: #3ba5e0;
 }
 article.post .prose > h3:first-child { margin-top: 2.5rem; }
 article.post .prose > h3:first-child + ul { margin: 0 0 1.5rem; padding: 0; background: transparent; border: 0; }
@@ -657,8 +657,8 @@ article.post .prose > h4:first-child { margin-top: 0; }
 article.post .prose > h4:first-child + ul {
 	margin: 0 0 2rem;
 	padding: 1.5rem 1.5rem 1.5rem 2.75rem;
-	background: #f6fcfa;
-	border: 1px dashed #4cc3a0;
+	background: #f4faff;
+	border: 1px dashed #3ba5e0;
 }
 article.post .prose > h4:first-child + ul li { margin: 0.5rem 0; }
 
@@ -677,7 +677,7 @@ article.post nav.toc .toc__item[class] {
 article.post nav.toc .toc__link[class][href] { font-size: 1.0625rem; line-height: 2; }
 article.post .prose ul:not(:first-child), article.post .prose ol { margin-block: 1rem 2rem; padding-left: 1.5rem; }
 article.post .prose li { margin: 0 0 0.6rem; line-height: 2; }
-article.post .prose li::marker { color: #4cc3a0; }
+article.post .prose li::marker { color: #3ba5e0; }
 
 
 /* ---- 記事タイトルと、サムネイルの幅（マナブログ踏襲）---- */
@@ -715,8 +715,8 @@ article.post .prose ul, article.post .prose ol,
 article.post .prose > h4:first-child + ul {
 	margin: 0 0 2.5rem;
 	padding: 2.5rem 1rem 2.25rem 2.5rem;
-	background: #f6fcfa;
-	border: 1px dashed #4cc3a0;
+	background: #f4faff;
+	border: 1px dashed #3ba5e0;
 }
 article.post .prose ul { list-style: disc; }
 article.post .prose ol { list-style: decimal; }
@@ -764,21 +764,21 @@ article.post nav.toc[class], article.post .post-rail[class] { display: none !imp
 	text-decoration: none;
 	transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.cat-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -12px rgb(16 24 40 / 0.22); border-color: #4cc3a0; }
+.cat-tile:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -12px rgb(16 24 40 / 0.22); border-color: #3ba5e0; }
 .cat-tile__icon {
 	display: grid;
 	place-items: center;
 	width: 44px;
 	height: 44px;
 	border-radius: 12px;
-	background: #d7f2e8;
-	color: #0c6e57;
+	background: #dff1fc;
+	color: #0b5f93;
 }
 .cat-tile__icon svg { width: 24px; height: 24px; }
 .cat-tile__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .cat-tile__name { font-size: 1rem; font-weight: 700; line-height: 1.5; }
 .cat-tile__desc { color: #4b5563; font-size: 0.8125rem; line-height: 1.55; }
-.cat-tile__count { color: #0c6e57; font-size: 1.25rem; font-weight: 700; line-height: 1; text-align: right; }
+.cat-tile__count { color: #0b5f93; font-size: 1.25rem; font-weight: 700; line-height: 1; text-align: right; }
 .cat-tile__count small { display: block; margin-top: 2px; color: #4b5563; font-size: 0.6875rem; font-weight: 500; }
 
 /* セクション見出し */
@@ -810,9 +810,9 @@ article.post nav.toc[class], article.post .post-rail[class] { display: none !imp
 	position: relative;
 	padding: 0.95rem 3rem 0.95rem 1.5rem;
 	border-radius: 999px;
-	background: #8fd6a4;
-	box-shadow: 0 4px 0 #5fb27a;
-	color: #17402a;
+	background: #8ad4f5;
+	box-shadow: 0 4px 0 #4fa8d6;
+	color: #10304a;
 	font-weight: 700;
 	line-height: 1.5;
 	text-align: center;
@@ -831,8 +831,8 @@ article.post nav.toc[class], article.post .post-rail[class] { display: none !imp
 }
 .prose > p > a[href^="http"]:only-child:hover {
 	transform: translateY(2px);
-	box-shadow: 0 2px 0 #5fb27a;
-	color: #17402a;
+	box-shadow: 0 2px 0 #4fa8d6;
+	color: #10304a;
 }
 
 /* 記事内の「関連記事」カード：本文のブロック種類を「引用」にして、リンクだけを入れる
