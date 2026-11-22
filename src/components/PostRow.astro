@@ -1,0 +1,165 @@
+---
+/**
+ * 記事のリスト表示（サムネイル付きの横長カード）。
+ * ラベル（カテゴリー）・タイトル・説明（2行）。公開から14日以内は「NEW」。
+ */
+import type { ContentEntry, InferCollectionData } from "emdash";
+import { Image } from "emdash/ui";
+
+interface Props {
+	post: ContentEntry<InferCollectionData<"posts">>;
+	labels?: Array<{ slug: string; label: string }>;
+	/** 0 のときは見出しにしない（記事の中の「関連記事」カード用。目次に入れない） */
+	headingLevel?: 0 | 2 | 3;
+}
+
+const { post, labels = [], headingLevel = 3 } = Astro.props;
+const Heading = (headingLevel === 0 ? "p" : `h${headingLevel}`) as "p" | "h2" | "h3";
+const href = `/posts/${post.id}`;
+const title = post.data.title || "無題";
+const publishedAt = post.data.publishedAt ?? null;
+const isNew =
+	publishedAt != null &&
+	Date.now() - publishedAt.getTime() < 14 * 24 * 60 * 60 * 1000;
+const shown = labels.slice(0, 2);
+---
+
+<article class="post-row">
+	<a href={href} class="post-row__link">
+		<span class="post-row__thumb">
+			{
+				post.data.featured_image ? (
+					<Image image={post.data.featured_image} sizes="(min-width: 720px) 220px, 38vw" />
+				) : (
+					<img src="/brand/banner.svg" alt="" loading="lazy" />
+				)
+			}
+		</span>
+		<span class="post-row__main">
+			<span class="post-row__meta">
+				{shown.map((l) => <span class="post-row__chip">{l.label}</span>)}
+				{isNew && <span class="post-row__new">NEW</span>}
+			</span>
+			<Heading class="post-row__title" {...post.edit.title}>{title.split("｜").map((part) => <span class="tpart">{part}</span>)}</Heading>
+			{
+				post.data.excerpt && (
+					<p class="post-row__excerpt" {...post.edit.excerpt}>
+						{post.data.excerpt}
+					</p>
+				)
+			}
+		</span>
+	</a>
+</article>
+
+<style>
+	.post-row {
+		list-style: none;
+	}
+	.post-row__link {
+		display: grid;
+		grid-template-columns: minmax(96px, 38%) 1fr;
+		gap: 1rem 1.25rem;
+		align-items: center;
+		padding: 0.85rem;
+		background: #fff;
+		border: 1px solid var(--color-border-subtle);
+		border-radius: 14px;
+		box-shadow: 0 1px 2px rgb(16 24 40 / 0.04);
+		color: #1f2a37;
+		text-decoration: none;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+	@media (min-width: 720px) {
+		.post-row__link {
+			grid-template-columns: 220px 1fr;
+			padding: 1rem;
+		}
+	}
+	.post-row__link:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 24px -12px rgb(16 24 40 / 0.22);
+	}
+	.post-row__thumb {
+		display: block;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		border-radius: 10px;
+		background: var(--gray-bg);
+	}
+	.post-row__thumb :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		transition: transform 0.35s ease;
+	}
+	.post-row__link:hover .post-row__thumb :global(img) {
+		transform: scale(1.05);
+	}
+	.post-row__main {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		min-width: 0;
+	}
+	.post-row__meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem 0.6rem;
+		font-size: 0.8125rem;
+	}
+	.post-row__chip {
+		padding: 2px 10px;
+		border-radius: 999px;
+		background: #d7f2e8;
+		color: #0c6e57;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+	}
+	.post-row__new {
+		padding: 2px 8px;
+		border-radius: 999px;
+		background: #1d3557;
+		color: #fff;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+	}
+	.post-row__title {
+			margin: 0;
+			font-size: 1.0625rem;
+			font-weight: 700;
+			line-height: 1.6;
+		}
+		/* 「｜」の前後を、それぞれまとまりとして改行する（途中で意味が切れないようにする） */
+		.post-row__title .tpart {
+			display: block;
+		}
+	.post-row__excerpt {
+		margin: 0;
+		color: #4b5563;
+		font-size: 0.875rem;
+		line-height: 1.7;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	@media (max-width: 719px) {
+		.post-row__excerpt {
+			display: none;
+		}
+		/* スマホ：サムネイルを上、見出しを下に縦に並べて、見出しは省略せず全部出す */
+		.post-row__link {
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
+		}
+		.post-row__title {
+			display: block;
+			-webkit-line-clamp: unset;
+			overflow: visible;
+		}
+	}
+</style>

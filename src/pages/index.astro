@@ -1,0 +1,145 @@
+---
+import { getEmDashEntry, getTermsForEntries, getSiteSettings } from "emdash";
+import Base from "../layouts/Base.astro";
+import PostRow from "../components/PostRow.astro";
+import PickupCard from "../components/PickupCard.astro";
+import { resolveBlogSiteIdentity } from "../utils/site-identity";
+
+const settings = await getSiteSettings();
+const { siteTitle } = resolveBlogSiteIdentity(settings);
+
+// トップ専用の説明文・SNS用の画像・正規URL（2026-11-14 SEO対応）。
+// サイト設定のキャッチフレーズが空で、説明文が出ていなかったため、ここで指定する。
+const HOME_DESCRIPTION =
+	"メンズ医療脱毛・ヒゲ脱毛クリニックを選ぶときの確認ポイントを、公式に公開されている情報をもとに整理するサイト。料金・追加費用・契約と解約・脱毛機・通い方まで、決める順番に沿って解説します。";
+const homeCanonical = `${Astro.url.origin}/`;
+const homeImage = `${Astro.url.origin}/brand/og-default.png`;
+
+// トップの構成：カテゴリー（大分類）ごとに、トップに出したい記事だけを固定で並べる。
+// 固定にしていない記事は、トップには出ない（各見出しの「すべて見る」ボタンから、カテゴリーのページで読める）。
+// 分類はカテゴリー1本だけ。見出しの名前と slug は、管理画面のカテゴリーと同じにする。
+type Group = { slug: string; title: string; featured?: boolean; pinned: string[] };
+// 記事ができたら、ここにカテゴリーごとの固定記事を並べる（カテゴリーの slug は管理画面と同じにする）。
+const GROUPS: Group[] = [];
+
+const fetchEntry = async (slug: string) => {
+	try {
+		const { entry } = await getEmDashEntry("posts", slug);
+		return entry ?? null;
+	} catch {
+		return null;
+	}
+};
+const groups = (
+	await Promise.all(
+		GROUPS.map(async (g) => ({
+			...g,
+			posts: (await Promise.all(g.pinned.map(fetchEntry))).filter(
+				(p): p is NonNullable<typeof p> => p !== null,
+			),
+		})),
+	)
+).filter((g) => g.posts.length > 0);
+
+const ids = groups.flatMap((g) => g.posts.map((p) => p.data.id));
+const termsByEntry = ids.length
+	? await getTermsForEntries("posts", ids, "category")
+	: new Map();
+const labelsOf = (id: string) =>
+	(termsByEntry.get(id) ?? []).map((t: any) => ({ slug: t.slug, label: t.label }));
+---
+
+<Base title={siteTitle} description={HOME_DESCRIPTION} canonical={homeCanonical} image={homeImage}>
+	{
+		groups.length === 0 ? (
+			<section class="band section">
+				<div class="frame">
+					<div class="empty-state">
+						<h2 class="empty-state__title">記事は、まだありません</h2>
+						<p class="empty-state__text">管理画面から、最初の記事を作成してください。</p>
+						<div class="empty-state__actions">
+							<a href="/_emdash/admin/content/posts/new" class="btn">記事を作成する</a>
+						</div>
+					</div>
+				</div>
+			</section>
+		) : (
+			<section class="band section home-wrap">
+				<div class="frame">
+					<h1 class="sr-only">{siteTitle}</h1>
+					<div class="home-panel">
+						<div class="home-intro">
+							<p>
+								メンズ脱毛研究室は、公式に公開されている情報をもとに、メンズ医療脱毛・ヒゲ脱毛クリニックの料金・脱毛機・条件を並べて比べるサイトです。選び方の基本から、地域別の比較、料金と契約の見方まで、記事ごとに整理しています。
+							</p>
+							<ul class="home-intro__links">
+								<li><a href="/category/select">クリニックを選ぶ</a></li>
+								<li><a href="/category/region">地域で選ぶ</a></li>
+								<li><a href="/category/money">料金と契約を知る</a></li>
+								<li><a href="/category/faq">よくある質問</a></li>
+							</ul>
+						</div>
+						{groups.map((g) => (
+							<section class="home-group" aria-label={g.title}>
+								<h2 class="home-section-title">{g.title}</h2>
+								{g.featured ? (
+									<div class="pickup-grid">
+										{g.posts.map((post) => (
+											<PickupCard post={post} tags={labelsOf(post.data.id)} />
+										))}
+									</div>
+								) : (
+									<ol class="post-list">
+										{g.posts.map((post) => (
+											<li>
+												<PostRow post={post} labels={labelsOf(post.data.id)} />
+											</li>
+										))}
+									</ol>
+								)}
+								<p class="home-more">
+									<a href={`/category/${g.slug}`}>「{g.title}」の記事をすべて見る</a>
+								</p>
+							</section>
+						))}
+					</div>
+				</div>
+			</section>
+		)
+	}
+</Base>
+
+<style>
+	.home-intro {
+		margin-bottom: 1.6rem;
+		padding-bottom: 1.4rem;
+		border-bottom: 1px solid #e6e9ed;
+	}
+	.home-intro p {
+		margin: 0;
+		font-size: 0.9375rem;
+		line-height: 1.85;
+		color: #374151;
+	}
+	.home-intro__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 0.75rem;
+		margin: 0.9rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+	.home-intro__links a {
+		display: inline-block;
+		padding: 0.5rem 1rem;
+		border: 1px solid #cfd6de;
+		border-radius: 999px;
+		background: #fff;
+		color: #1f2933;
+		font-size: 0.875rem;
+		text-decoration: none;
+	}
+	.home-intro__links a:hover {
+		background: #f3f5f8;
+	}
+</style>

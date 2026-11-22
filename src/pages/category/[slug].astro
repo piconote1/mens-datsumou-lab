@@ -1,0 +1,187 @@
+---
+import {
+	getTaxonomyTermsWithCacheHint,
+	getEmDashCollection,
+	getTermsForEntries,
+	decodeSlug,
+} from "emdash";
+import Base from "../../layouts/Base.astro";
+import PostRow from "../../components/PostRow.astro";
+import PostCard from "../../components/PostCard.astro";
+import Pagination from "../../components/Pagination.astro";
+
+const slug = decodeSlug(Astro.params.slug);
+const termsResult = await getTaxonomyTermsWithCacheHint("category", {
+	includeCounts: false,
+});
+const term = slug ? termsResult.data.find((item) => item.slug === slug) : null;
+
+if (!term) {
+	return Astro.rewrite("/404");
+}
+
+const cursor = Astro.url.searchParams.get("cursor") || undefined;
+const {
+	entries: posts,
+	cacheHint,
+	nextCursor,
+} = await getEmDashCollection("posts", {
+	where: { category: term.slug },
+	orderBy: { published_at: "desc" },
+	limit: 20,
+	cursor,
+});
+
+if (Astro.cache?.enabled) {
+	Astro.cache.set(termsResult.cacheHint);
+	Astro.cache.set(cacheHint);
+}
+
+// Single batched query for tags on every post in this category, rather
+// than calling getEntryTerms() per post (which would be one round-trip
+// per post).
+const tagsByEntry = await getTermsForEntries(
+	"posts",
+	posts.map((p) => p.data.id),
+	"tag",
+);
+const filteredPosts = posts.map((post) => ({
+	post,
+	tags: tagsByEntry.get(post.data.id) ?? [],
+}));
+// カテゴリーごとの、タイトル・説明（検索結果に出る文）。自動の「〜の記事」をやめる（2026-11-20）。
+const CATEGORY_META: Record<string, { title: string; description: string }> = {
+	select: {
+		title: "脱毛を選ぶ｜クリニック選びの比較記事",
+		description:
+			"医療脱毛クリニックを選ぶための記事をまとめています。選び方のガイド、全身5回の料金比較、ジェントルマックスプロが使える院、都度払いができる院を、公式ページの情報で比較しています。",
+	},
+	region: {
+		title: "地域で選ぶ｜東京・大阪・福岡・名古屋・札幌の医療脱毛",
+		description:
+			"東京・大阪・福岡・名古屋・札幌の医療脱毛クリニックを、料金・脱毛機・最寄り駅で比較した記事の一覧です。公式ページの情報をもとに整理しています。",
+	},
+	basic: {
+		title: "基礎を知る｜医療脱毛とエステ脱毛の違い・脱毛機の種類",
+		description:
+			"医療脱毛とエステ脱毛の違い、脱毛の部位とコース、脱毛機の方式（熱破壊式・蓄熱式）など、クリニックを選ぶ前に知っておきたい基礎の記事の一覧です。",
+	},
+	money: {
+		title: "お金と契約｜脱毛の料金・回数・契約と解約",
+		description:
+			"脱毛の総額に含まれるもの、回数の目安、クーリング・オフや中途解約など、契約の前に確認したいお金と契約の記事の一覧です。",
+	},
+	visit: {
+		title: "通う・受ける｜予約・準備・VIO・痛みと肌トラブル",
+		description:
+			"脱毛に通い続けるための確認事項、施術前の準備、VIO脱毛の流れ、痛みや肌トラブルへの備えなど、通う・受けるときの記事の一覧です。",
+	},
+	faq: {
+		title: "よくある質問｜脱毛の契約・料金・通い方・準備",
+		description:
+			"医療脱毛の契約・料金・回数・痛み・通い方・準備について、よくある質問に短く答えて、詳しい記事へつなぐページの一覧です。",
+	},
+};
+const catMeta = CATEGORY_META[term.slug] ?? {
+	title: `${term.label}の記事`,
+	description: `${term.label}の記事一覧`,
+};
+const catCanonical = `${Astro.url.origin}/category/${term.slug}`;
+---
+
+<Base
+	title={catMeta.title}
+	description={catMeta.description}
+	canonical={catCanonical}
+	breadcrumbs={[
+		{ name: "ホーム", url: "/" },
+		{ name: term.label, url: `/category/${term.slug}` },
+	]}
+>
+	<header class="band intro">
+		<div class="frame archive-intro">
+			<div class="archive-intro__text">
+				<p class="eyebrow">カテゴリー</p>
+				<h1 class="intro__title">{term.label}</h1>
+				<p class="intro__lead">
+					{term.description || `${term.label}の記事を、新しい順に並べています。`}
+				</p>
+			</div>
+			<a href="/posts" class="arrow-link">
+				記事一覧
+				<svg
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.75"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<path d="M5 12h14"></path>
+					<path d="m12 5 7 7-7 7"></path>
+				</svg>
+			</a>
+		</div>
+	</header>
+
+	<section class="band section">
+		<div class="frame">
+			{
+				filteredPosts.length > 0 ? (
+					<>
+						<ol class="post-list">
+							{filteredPosts.map(({ post, tags }) => (
+								<li>
+									<PostRow
+										post={post}
+										labels={tags.map((t) => ({ slug: t.slug, label: t.label }))}
+									/>
+								</li>
+							))}
+						</ol>
+						<Pagination
+							basePath={`/category/${term.slug}`}
+							cursor={cursor}
+							nextCursor={nextCursor}
+						/>
+					</>
+				) : (
+					<div class="empty-state">
+						<h2 class="empty-state__title">
+							{cursor ? "これ以上、記事はありません" : "まだ記事がありません"}
+						</h2>
+						<p class="empty-state__text">
+							{cursor
+								? "最後の記事より先のページです。"
+								: `${term.label}の記事は、まだありません。`}
+						</p>
+						<div class="empty-state__actions">
+							<a
+								href={cursor ? `/category/${term.slug}` : "/posts"}
+								class="btn btn--ghost"
+							>
+								{cursor ? "最初のページへ戻る" : "すべての記事を見る"}
+							</a>
+						</div>
+					</div>
+				)
+			}
+		</div>
+	</section>
+</Base>
+
+<style>
+	.archive-intro {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		align-items: last baseline;
+		justify-content: space-between;
+		gap: var(--spacing-5) var(--spacing-10);
+	}
+
+	.archive-intro__text {
+		min-width: 0;
+	}
+</style>
