@@ -42,3 +42,22 @@ for (const root of roots) {
 	root.insertBefore(bar, panels[0]);
 	show(0);
 }
+
+// 店舗情報タブの「店舗一覧」を、ボタンで開閉するプルダウンにする。リストの中身は、記事のHTMLに入っている。
+for (const box of document.querySelectorAll<HTMLElement>(".dt-tabs .dt-stores")) {
+	const label = box.querySelector<HTMLElement>(".dt-stores__label");
+	const list = box.querySelector<HTMLElement>("ul");
+	if (!label || !list) continue;
+	const btn = document.createElement("button");
+	btn.type = "button";
+	btn.className = "dt-stores__btn";
+	btn.textContent = label.textContent || "店舗一覧";
+	btn.setAttribute("aria-expanded", "false");
+	label.replaceWith(btn);
+	list.hidden = true;
+	btn.addEventListener("click", () => {
+		const open = list.hidden;
+		list.hidden = !open;
+		btn.setAttribute("aria-expanded", String(open));
+	});
+}

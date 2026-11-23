@@ -113,3 +113,17 @@
 .dt-tabs .dt-root table{min-width:600px}}
 
 .dt-tabs__note{margin:8px 2px 0;font-size:12px;line-height:1.6;color:#5b6773}
+
+/* 店舗情報タブの「店舗一覧」プルダウン。スクリプトが動くと、ボタンで開閉する（dt-tabs.ts）。動かないときは、一覧がそのまま見える。2026-11-23 */
+.dt-tabs .dt-stores{margin-top:6px}
+.dt-tabs .dt-stores__label{display:block;margin-bottom:3px;font-size:11px;color:#10304a}
+.dt-tabs .dt-stores__btn{display:flex;justify-content:space-between;align-items:center;width:100%;padding:4px 8px;border:1px solid #cfd6de;border-radius:6px;background:#fff;color:#10304a;font:inherit;font-size:11px;font-weight:400;line-height:1.4;text-align:left;cursor:pointer}
+.dt-tabs .dt-stores__btn::after{content:"▼";margin-left:6px;font-size:8px;color:#5b6773}
+.dt-tabs .dt-stores__btn[aria-expanded="true"]::after{content:"▲"}
+.dt-tabs .dt-stores ul{list-style:none;margin:4px 0 0;padding:0;max-height:170px;overflow-y:auto;border:1px solid #e6e9ed;border-radius:6px;background:#fff}
+.dt-tabs .dt-stores li{margin:0;padding:0;list-style:none}
+.dt-tabs .dt-stores li::before,.dt-tabs .dt-stores li::marker{content:none;display:none}
+.dt-tabs .dt-stores ul{padding-left:0}
+.dt-tabs .dt-stores li a{display:block;padding:3px 8px;border-bottom:1px solid #f0f2f5;font-size:11px;line-height:1.4;color:#1a78b8;text-decoration:none}
+.dt-tabs .dt-stores li:last-child a{border-bottom:0}
+.dt-tabs .dt-stores li a:hover{background:#f4faff;text-decoration:underline}
