@@ -118,7 +118,7 @@ const openStores = (title: string, links: HTMLAnchorElement[]) => {
 		const sec = document.createElement("section");
 		sec.className = "dt-modal__reg";
 		const t = document.createElement("h4");
-		t.textContent = region;
+		t.textContent = region === "その他" && links.length === 1 ? "公式サイトの一覧" : region;
 		const ul = document.createElement("ul");
 		for (const a of items) {
 			const li = document.createElement("li");
@@ -155,12 +155,28 @@ const openStores = (title: string, links: HTMLAnchorElement[]) => {
 	close.focus();
 };
 
-for (const box of document.querySelectorAll<HTMLElement>(".dt-tabs .dt-stores")) {
+// 表（タブ）と、各院の詳細表の、どちらにも付ける。院名は、表の行のリンクか、詳細表の直前の見出し（h3）から取る。
+const clinicNameFor = (box: HTMLElement): string => {
+	const fromRow = box.closest("tr")?.querySelector<HTMLElement>("a.dt-name")?.textContent?.trim();
+	if (fromRow) return fromRow;
+	let el: Element | null = box.closest(".dt-root");
+	while (el) {
+		let prev: Element | null = el.previousElementSibling;
+		while (prev) {
+			if (prev.tagName === "H3") return prev.textContent?.trim() || "";
+			prev = prev.previousElementSibling;
+		}
+		el = el.parentElement;
+	}
+	return "";
+};
+
+for (const box of document.querySelectorAll<HTMLElement>(".dt-root .dt-stores")) {
 	const label = box.querySelector<HTMLElement>(".dt-stores__label");
 	const list = box.querySelector<HTMLElement>("ul");
 	if (!label || !list) continue;
 	const links = Array.from(list.querySelectorAll<HTMLAnchorElement>("a"));
-	const clinic = box.closest("tr")?.querySelector<HTMLElement>("a.dt-name")?.textContent?.trim() || "";
+	const clinic = clinicNameFor(box);
 	const btn = document.createElement("button");
 	btn.type = "button";
 	btn.className = "dt-stores__btn";
@@ -168,5 +184,5 @@ for (const box of document.querySelectorAll<HTMLElement>(".dt-tabs .dt-stores"))
 	btn.setAttribute("aria-haspopup", "dialog");
 	label.replaceWith(btn);
 	list.hidden = true;
-	btn.addEventListener("click", () => openStores(`${clinic}の店舗一覧（${links.length}院）`, links));
+	btn.addEventListener("click", () => openStores(links.length > 1 ? `${clinic}の店舗一覧（${links.length}院）` : `${clinic}の店舗一覧`, links));
 }

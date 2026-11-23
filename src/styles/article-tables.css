@@ -116,18 +116,17 @@
 .dt-tabs__note{margin:8px 2px 0;font-size:12px;line-height:1.6;color:#5b6773}
 
 /* 店舗情報タブの「店舗一覧」プルダウン。スクリプトが動くと、ボタンで開閉する（dt-tabs.ts）。動かないときは、一覧がそのまま見える。2026-11-23 */
-.dt-tabs .dt-stores{margin-top:6px}
-.dt-tabs .dt-stores__label{display:block;margin-bottom:3px;font-size:11px;color:#10304a}
-.dt-tabs .dt-stores__btn{display:flex;justify-content:space-between;align-items:center;width:100%;padding:4px 8px;border:1px solid #cfd6de;border-radius:6px;background:#fff;color:#10304a;font:inherit;font-size:11px;font-weight:400;line-height:1.4;text-align:left;cursor:pointer}
-.dt-tabs .dt-stores__btn::after{content:"▼";margin-left:6px;font-size:8px;color:#5b6773}
-.dt-tabs .dt-stores__btn[aria-expanded="true"]::after{content:"▲"}
-.dt-tabs .dt-stores ul{list-style:none;margin:4px 0 0;padding:0;max-height:170px;overflow-y:auto;border:1px solid #e6e9ed;border-radius:6px;background:#fff}
-.dt-tabs .dt-stores li{margin:0;padding:0;list-style:none}
-.dt-tabs .dt-stores li::before,.dt-tabs .dt-stores li::marker{content:none;display:none}
-.dt-tabs .dt-stores ul{padding-left:0}
-.dt-tabs .dt-stores li a{display:block;padding:3px 8px;border-bottom:1px solid #f0f2f5;font-size:11px;line-height:1.4;color:#1a78b8;text-decoration:none}
-.dt-tabs .dt-stores li:last-child a{border-bottom:0}
-.dt-tabs .dt-stores li a:hover{background:#f4faff;text-decoration:underline}
+.dt-root .dt-stores{margin-top:6px}
+.dt-root .dt-stores__label{display:block;margin-bottom:3px;font-size:11px;color:#10304a}
+.dt-root .dt-stores__btn{display:flex;justify-content:space-between;align-items:center;width:100%;padding:4px 8px;border:1px solid #cfd6de;border-radius:6px;background:#fff;color:#10304a;font:inherit;font-size:11px;font-weight:400;line-height:1.4;text-align:left;cursor:pointer}
+.dt-root .dt-stores__btn::after{content:"›";margin-left:6px;font-size:13px;color:#5b6773}
+.dt-root .dt-stores ul{list-style:none;margin:4px 0 0;padding:0;max-height:170px;overflow-y:auto;border:1px solid #e6e9ed;border-radius:6px;background:#fff}
+.dt-root .dt-stores li{margin:0;padding:0;list-style:none}
+.dt-root .dt-stores li::before,.dt-root .dt-stores li::marker{content:none;display:none}
+.dt-root .dt-stores ul{padding-left:0}
+.dt-root .dt-stores li a{display:block;padding:3px 8px;border-bottom:1px solid #f0f2f5;font-size:11px;line-height:1.4;color:#1a78b8;text-decoration:none}
+.dt-root .dt-stores li:last-child a{border-bottom:0}
+.dt-root .dt-stores li a:hover{background:#f4faff;text-decoration:underline}
 
 /* 料金タブ：ヒゲ3部位〜VIO の4列を同じ幅にして、価格が途中で折り返さないようにする。2026-11-23 */
 .dt-tabs [data-tab-title^="料金"] table{table-layout:fixed;min-width:560px}
@@ -158,7 +157,7 @@
 .dt-tabs .dt-root thead th:last-child{border-right:0}
 
 /* 店舗一覧のポップアップ（地域ごとに各院を並べる） */
-.dt-tabs .dt-stores__btn{justify-content:center}
+.dt-root .dt-stores__btn{justify-content:center}
 .dt-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,25,35,.55)}
 .dt-modal__box{display:flex;flex-direction:column;width:min(640px,100%);max-height:min(80vh,640px);border-radius:12px;background:#fff;box-shadow:0 10px 40px rgba(0,0,0,.3);overflow:hidden}
 .dt-modal__head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 16px;border-bottom:1px solid #e6e9ed;font-size:15px}
