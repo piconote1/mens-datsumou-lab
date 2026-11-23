@@ -41,6 +41,28 @@ for (const root of roots) {
 
 	root.insertBefore(bar, panels[0]);
 	show(0);
+
+	// 表の高さを、3つのタブで同じにする。タブを切り替えても、下の本文が上下に動かない。
+	// 高さは、いちばん高い表にそろえる（min-height）。ウィンドウ幅や画像の読み込みで変わるので、測り直す。
+	const equalize = () => {
+		const current = buttons.findIndex((b) => b.getAttribute("aria-selected") === "true");
+		for (const panel of panels) {
+			panel.style.minHeight = "";
+			panel.hidden = false;
+		}
+		const tallest = Math.max(...panels.map((panel) => panel.offsetHeight));
+		panels.forEach((panel, k) => {
+			panel.style.minHeight = `${tallest}px`;
+			panel.hidden = k !== current;
+		});
+	};
+	equalize();
+	window.addEventListener("load", equalize);
+	let timer: number | undefined;
+	window.addEventListener("resize", () => {
+		window.clearTimeout(timer);
+		timer = window.setTimeout(equalize, 150);
+	});
 }
 
 // 店舗情報タブの「店舗一覧」を、ボタンで開閉するプルダウンにする。リストの中身は、記事のHTMLに入っている。

@@ -468,7 +468,8 @@ footer.site-footer[class] .site-footer__widgets { display: none; }
 
 /* ヘッダーのサイトロゴ画像。まいかのロゴと、文字の大きさ（漢字の高さ約40px）・上下の位置をそろえる。幅は文字数が違うので、そろえない（パソコン333px、スマホ250px）。枠は縦中央にそろえる */
 .brand__logo-img { display: block; height: auto; width: 333px; max-width: 100%; }
-@media (max-width: 600px) { .brand__logo-img { width: 250px; } }
+/* 画面が狭いスマホでも、ロゴの右の検索ボタンが、下に折り返さないように、ロゴを画面幅に合わせて縮める（2026-11-23） */
+@media (max-width: 600px) { .brand__logo-img { width: min(250px, calc(100vw - 120px)); } }
 
 /* 管理画面でサイトロゴを設定した場合も、同じ大きさで表示する */
 header.site-header .brand .brand__logo[class] { height: auto; width: 250px; max-width: none; }

@@ -87,9 +87,10 @@
 
 /* タブ切り替えの比較表（.dt-tabs）。ロゴを行頭に置く。2026-11-23。スクリプトは src/scripts/dt-tabs.ts */
 .dt-tabs{margin:1.25em 0}
-.dt-tabs__tabs{display:flex;gap:6px;margin:0 0 -1px;position:relative;z-index:1}
-.dt-tabs__tab{flex:1 1 0;padding:12px 8px;border:1px solid #d9dee4;border-bottom:0;border-radius:10px 10px 0 0;background:#eef1f4;color:#5b6773;font-weight:700;font-size:15px;line-height:1.4;cursor:pointer;font-family:inherit}
-.dt-tabs__tab[aria-selected="true"]{background:#fff;color:#10304a;box-shadow:inset 0 3px 0 #3ba5e0}
+.dt-tabs__tabs{display:flex;gap:4px;margin:0;border-bottom:2px solid #1a78b8;position:relative}
+.dt-tabs__tab{flex:1 1 0;padding:11px 8px;border:1px solid #3ba5e0;border-bottom:0;border-radius:10px 10px 0 0;background:#3ba5e0;color:#fff;font-weight:700;font-size:15px;line-height:1.4;cursor:pointer;font-family:inherit}
+.dt-tabs__tab:hover{background:#2f97d3;border-color:#2f97d3}
+.dt-tabs__tab[aria-selected="true"]{background:#1a78b8;border-color:#1a78b8;color:#fff}
 .dt-tabs__tab:focus-visible{outline:2px solid #3ba5e0;outline-offset:2px}
 .dt-tabs [hidden]{display:none}
 .dt-tabs .dt-root{margin:0}
