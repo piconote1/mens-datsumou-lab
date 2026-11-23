@@ -49,6 +49,15 @@ for (const root of roots) {
 		for (const panel of panels) {
 			panel.style.minHeight = "";
 			panel.hidden = false;
+			for (const tr of panel.querySelectorAll<HTMLElement>("tr")) tr.style.height = "";
+		}
+		// 行（見出し行・各クリニックの行）の高さを、3つのタブでそろえる。同じ順番の行は、いちばん高い行にそろえる。
+		const rowSets = panels.map((panel) => Array.from(panel.querySelectorAll<HTMLElement>("tr")));
+		const rowCount = Math.max(...rowSets.map((rows) => rows.length));
+		for (let i = 0; i < rowCount; i++) {
+			const rows = rowSets.map((set) => set[i]).filter((row): row is HTMLElement => Boolean(row));
+			const h = Math.max(...rows.map((row) => row.getBoundingClientRect().height));
+			for (const row of rows) row.style.height = `${h}px`;
 		}
 		const tallest = Math.max(...panels.map((panel) => panel.offsetHeight));
 		panels.forEach((panel, k) => {
