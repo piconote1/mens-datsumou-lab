@@ -136,3 +136,12 @@
 .dt-tabs [data-tab-title="料金"] thead th:nth-child(6){width:96px}
 .dt-tabs [data-tab-title="料金"] td{padding:8px 10px;white-space:nowrap}
 .dt-tabs [data-tab-title="料金"] td small{white-space:normal}
+
+/* 脱毛機の方式バッジ（熱破壊／蓄熱／併用）と、表の下の注釈 */
+.dt-m{margin:0 0 3px;line-height:1.55}
+.dt-tag{display:inline-block;margin-right:4px;padding:0 6px;border-radius:999px;font-size:10px;font-weight:700;line-height:17px;color:#fff;vertical-align:1px;white-space:nowrap}
+.dt-tag--heat{background:#e0733a}
+.dt-tag--store{background:#2f97d3}
+.dt-tag--both{background:linear-gradient(90deg,#e0733a 50%,#2f97d3 50%)}
+.dt-notes{margin:8px 2px 0;color:#6b7785;line-height:1.7}
+.dt-notes small{display:block;font-size:11px}
