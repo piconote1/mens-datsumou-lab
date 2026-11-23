@@ -187,3 +187,7 @@
 /* クリニック列と詳細列の幅は、3つのタブで同じ（固定） */
 .dt-tabs .dt-root thead th:last-child{width:96px;min-width:96px;max-width:96px}
 .dt-tabs .dt-root tbody tr>td:last-child{width:96px;min-width:96px;max-width:96px}
+
+/* 各院の紹介のロゴ：記事の幅いっぱいに出す */
+.dt-clogo{margin:0 0 10px}
+.dt-clogo img{display:block;width:100%;height:auto}
