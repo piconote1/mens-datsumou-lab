@@ -238,3 +238,8 @@
 .prose .emdash-file {
 	border-radius: var(--radius-lg) !important;
 }
+
+/* 記事の先頭が見出しのとき、上に余白を作らない（サムネイルとの間が空きすぎるため）。2026-11-23 */
+.prose.prose > :is(h1, h2, h3):first-child {
+	margin-block-start: 0;
+}
