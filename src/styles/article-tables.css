@@ -132,8 +132,8 @@
 /* 料金タブ：ヒゲ3部位〜VIO の4列を同じ幅にして、価格が途中で折り返さないようにする。2026-11-23 */
 .dt-tabs [data-tab-title="料金"] table{table-layout:fixed;min-width:760px}
 .dt-tabs [data-tab-title="料金"] thead th:nth-child(1){width:140px}
-.dt-tabs [data-tab-title="料金"] thead th:nth-child(n+2):nth-child(-n+5){width:calc((100% - 140px - 96px) / 4)}
-.dt-tabs [data-tab-title="料金"] thead th:nth-child(6){width:96px}
+.dt-tabs [data-tab-title="料金"] thead th:nth-child(n+2):nth-child(-n+6){width:calc((100% - 140px - 96px) / 5)}
+.dt-tabs [data-tab-title="料金"] thead th:nth-child(7){width:96px}
 .dt-tabs [data-tab-title="料金"] td{padding:8px 10px;white-space:nowrap}
 .dt-tabs [data-tab-title="料金"] td small{white-space:normal}
 
@@ -211,3 +211,12 @@
 .dt-root table.dt-goal tbody td:nth-child(2){width:128px;white-space:nowrap}
 .dt-root table.dt-spec .dt-m{margin:0 0 3px}
 .dt-root table.dt-spec small.dt-r{font-size:11px;color:#6b7785}
+
+/* おすすめポイント（枠つきカード）と、詳細表の料金行 */
+.dt-pts{display:grid;gap:10px;margin:8px 0 18px}
+.dt-pt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid #cfe5f4;border-left:4px solid #3ba5e0;border-radius:10px;background:#f5fbff}
+.dt-pt__n{flex:none;width:28px;height:28px;border-radius:50%;background:#3ba5e0;color:#fff;font-weight:700;font-size:14px;line-height:28px;text-align:center}
+.dt-pt__b strong{display:block;margin:0 0 2px;font-size:15px;color:#10304a}
+.dt-pt__b p{margin:0;font-size:13px;line-height:1.7;color:#33404c}
+.dt-root table.dt-spec .dt-k{display:inline-block;flex:none;width:7.2em;color:#6b7785;font-size:12px}
+.dt-root table.dt-spec .dt-v{font-weight:700}
