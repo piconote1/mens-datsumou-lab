@@ -74,21 +74,100 @@ for (const root of roots) {
 	});
 }
 
-// 店舗情報タブの「店舗一覧」を、ボタンで開閉するプルダウンにする。リストの中身は、記事のHTMLに入っている。
+// 店舗情報タブの「店舗一覧」を、ポップアップ（モーダル）にする。表の高さは、変わらない。
+// 一覧は、地域ごとに、各院を並べる。リストの中身は、記事のHTMLに入っている。
+const REGIONS: Array<[string, string[]]> = [
+	["北海道", ["札幌", "旭川"]],
+	["東北", ["青森", "八戸", "盛岡", "仙台", "秋田", "郡山", "いわき"]],
+	["関東", ["新宿", "銀座", "渋谷", "池袋", "上野", "立川", "町田", "吉祥寺", "東銀座", "大宮", "千葉", "柏", "船橋", "横浜", "桜木町", "川崎", "高崎", "宇都宮", "水戸"]],
+	["甲信越・北陸", ["新潟", "富山", "金沢", "福井", "長野"]],
+	["東海", ["岐阜", "静岡", "浜松", "名古屋", "名駅", "四日市"]],
+	["近畿", ["梅田", "心斎橋", "天王寺", "なんば", "京都", "神戸", "姫路", "奈良", "和歌山", "彦根", "大阪"]],
+	["中国・四国", ["広島", "岡山", "山口", "徳島", "高松", "松山", "高知"]],
+	["九州・沖縄", ["福岡", "天神", "博多", "小倉", "久留米", "長崎", "佐世保", "大分", "熊本", "宮崎", "鹿児島", "那覇", "沖縄"]],
+];
+const regionOf = (name: string) => REGIONS.find(([, keys]) => keys.some((k) => name.includes(k)))?.[0] ?? "その他";
+
+const openStores = (title: string, links: HTMLAnchorElement[]) => {
+	const overlay = document.createElement("div");
+	overlay.className = "dt-modal";
+	overlay.setAttribute("role", "dialog");
+	overlay.setAttribute("aria-modal", "true");
+	const box = document.createElement("div");
+	box.className = "dt-modal__box";
+	const head = document.createElement("div");
+	head.className = "dt-modal__head";
+	const h = document.createElement("strong");
+	h.textContent = title;
+	const close = document.createElement("button");
+	close.type = "button";
+	close.className = "dt-modal__close";
+	close.setAttribute("aria-label", "閉じる");
+	close.textContent = "×";
+	head.append(h, close);
+	const body = document.createElement("div");
+	body.className = "dt-modal__body";
+	const groups = new Map<string, HTMLAnchorElement[]>();
+	for (const a of links) {
+		const r = regionOf(a.textContent || "");
+		if (!groups.has(r)) groups.set(r, []);
+		groups.get(r)?.push(a);
+	}
+	for (const region of [...REGIONS.map(([name]) => name), "その他"]) {
+		const items = groups.get(region);
+		if (!items) continue;
+		const sec = document.createElement("section");
+		sec.className = "dt-modal__reg";
+		const t = document.createElement("h4");
+		t.textContent = region;
+		const ul = document.createElement("ul");
+		for (const a of items) {
+			const li = document.createElement("li");
+			const link = document.createElement("a");
+			link.href = a.href;
+			link.target = "_blank";
+			link.rel = "noopener";
+			link.textContent = a.textContent;
+			li.appendChild(link);
+			ul.appendChild(li);
+		}
+		sec.append(t, ul);
+		body.appendChild(sec);
+	}
+	box.append(head, body);
+	overlay.appendChild(box);
+	const prev = document.activeElement as HTMLElement | null;
+	const onKey = (e: KeyboardEvent) => {
+		if (e.key === "Escape") shut();
+	};
+	const shut = () => {
+		overlay.remove();
+		document.removeEventListener("keydown", onKey);
+		document.body.style.overflow = "";
+		prev?.focus();
+	};
+	close.addEventListener("click", shut);
+	overlay.addEventListener("click", (e) => {
+		if (e.target === overlay) shut();
+	});
+	document.addEventListener("keydown", onKey);
+	document.body.style.overflow = "hidden";
+	document.body.appendChild(overlay);
+	close.focus();
+};
+
 for (const box of document.querySelectorAll<HTMLElement>(".dt-tabs .dt-stores")) {
 	const label = box.querySelector<HTMLElement>(".dt-stores__label");
 	const list = box.querySelector<HTMLElement>("ul");
 	if (!label || !list) continue;
+	const links = Array.from(list.querySelectorAll<HTMLAnchorElement>("a"));
+	const clinic = box.closest("tr")?.querySelector<HTMLElement>("a.dt-name")?.textContent?.trim() || "";
 	const btn = document.createElement("button");
 	btn.type = "button";
 	btn.className = "dt-stores__btn";
-	btn.textContent = label.textContent || "店舗一覧";
-	btn.setAttribute("aria-expanded", "false");
+	btn.textContent = "店舗一覧を見る";
+	btn.setAttribute("aria-haspopup", "dialog");
 	label.replaceWith(btn);
 	list.hidden = true;
-	btn.addEventListener("click", () => {
-		const open = list.hidden;
-		list.hidden = !open;
-		btn.setAttribute("aria-expanded", String(open));
-	});
+	btn.addEventListener("click", () => openStores(`${clinic}の店舗一覧（${links.length}院）`, links));
 }
