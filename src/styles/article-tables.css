@@ -127,3 +127,11 @@
 .dt-tabs .dt-stores li a{display:block;padding:3px 8px;border-bottom:1px solid #f0f2f5;font-size:11px;line-height:1.4;color:#1a78b8;text-decoration:none}
 .dt-tabs .dt-stores li:last-child a{border-bottom:0}
 .dt-tabs .dt-stores li a:hover{background:#f4faff;text-decoration:underline}
+
+/* 料金タブ：ヒゲ3部位〜VIO の4列を同じ幅にして、価格が途中で折り返さないようにする。2026-11-23 */
+.dt-tabs [data-tab-title="料金"] table{table-layout:fixed;min-width:760px}
+.dt-tabs [data-tab-title="料金"] thead th:nth-child(1){width:150px}
+.dt-tabs [data-tab-title="料金"] thead th:nth-child(n+2):nth-child(-n+5){width:calc((100% - 150px - 96px) / 4)}
+.dt-tabs [data-tab-title="料金"] thead th:nth-child(6){width:96px}
+.dt-tabs [data-tab-title="料金"] td{padding:8px 10px;white-space:nowrap}
+.dt-tabs [data-tab-title="料金"] td small{white-space:normal}
