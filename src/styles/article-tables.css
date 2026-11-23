@@ -209,7 +209,8 @@
 .dt-root table.dt-spec.dt-p4 td{text-align:center;vertical-align:middle}
 .dt-root table.dt-spec.dt-p4 .dt-g strong{font-size:15px}
 .dt-root table.dt-goal tbody th{width:128px;min-width:128px;max-width:128px}
-.dt-root table.dt-goal tbody td:nth-child(2){width:128px;white-space:nowrap}
+.dt-root table.dt-goal tbody th small{display:block;margin-top:2px;font-size:11px;font-weight:400;color:#6b7785}
+@media (max-width:640px){.dt-root table.dt-goal tbody th{width:104px;min-width:104px;max-width:104px;font-size:12px}.dt-root table.dt-goal td{font-size:12px}}
 .dt-root table.dt-spec .dt-m{margin:0 0 3px}
 .dt-root table.dt-spec small.dt-r{font-size:11px;color:#6b7785}
 
