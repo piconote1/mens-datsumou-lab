@@ -145,3 +145,4 @@
 .dt-tag--both{background:linear-gradient(90deg,#e0733a 50%,#2f97d3 50%)}
 .dt-notes{margin:8px 2px 0;color:#6b7785;line-height:1.7}
 .dt-notes small{display:block;font-size:11px}
+.dt-p span{display:block}
