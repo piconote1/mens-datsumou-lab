@@ -59,9 +59,8 @@ for (const root of roots) {
 			const h = Math.max(...rows.map((row) => row.getBoundingClientRect().height));
 			for (const row of rows) row.style.height = `${h}px`;
 		}
-		const tallest = Math.max(...panels.map((panel) => panel.offsetHeight));
+		// 表の下の注釈は、タブごとに長さが違う。注釈の分まで高さをそろえると、下に大きな空白ができるので、そろえない。
 		panels.forEach((panel, k) => {
-			panel.style.minHeight = `${tallest}px`;
 			panel.hidden = k !== current;
 		});
 	};

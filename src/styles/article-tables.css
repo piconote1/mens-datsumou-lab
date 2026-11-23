@@ -96,7 +96,7 @@
 .dt-tabs .dt-root{margin:0}
 .dt-tabs .dt-root table{min-width:680px}
 .dt-tabs .dt-root td{vertical-align:middle;font-size:13px}
-.dt-tabs .dt-root thead th:first-child,.dt-tabs .dt-root tbody tr>th:first-child{width:150px;min-width:150px;max-width:150px;padding:8px 6px;text-align:center;vertical-align:middle}
+.dt-tabs .dt-root thead th:first-child,.dt-tabs .dt-root tbody tr>th:first-child{width:140px;min-width:140px;max-width:140px;padding:8px 6px;text-align:center;vertical-align:middle}
 .dt-tabs .dt-logoline{display:flex;align-items:center;justify-content:center;gap:6px}
 .dt-tabs .dt-logo img{display:block;width:100px;height:auto;margin:0 auto}
 .dt-tabs .dt-logo img.dt-rank{width:24px;height:auto;margin:0;flex:0 0 auto}
@@ -131,8 +131,8 @@
 
 /* 料金タブ：ヒゲ3部位〜VIO の4列を同じ幅にして、価格が途中で折り返さないようにする。2026-11-23 */
 .dt-tabs [data-tab-title="料金"] table{table-layout:fixed;min-width:760px}
-.dt-tabs [data-tab-title="料金"] thead th:nth-child(1){width:150px}
-.dt-tabs [data-tab-title="料金"] thead th:nth-child(n+2):nth-child(-n+5){width:calc((100% - 150px - 96px) / 4)}
+.dt-tabs [data-tab-title="料金"] thead th:nth-child(1){width:140px}
+.dt-tabs [data-tab-title="料金"] thead th:nth-child(n+2):nth-child(-n+5){width:calc((100% - 140px - 96px) / 4)}
 .dt-tabs [data-tab-title="料金"] thead th:nth-child(6){width:96px}
 .dt-tabs [data-tab-title="料金"] td{padding:8px 10px;white-space:nowrap}
 .dt-tabs [data-tab-title="料金"] td small{white-space:normal}
@@ -173,7 +173,6 @@
 .dt-tabs [data-tab-title="サービス"] thead th:nth-child(5){width:96px}
 
 .dt-tabs [data-tab-title="サービス"] .dt-m{white-space:nowrap}
-.dt-tabs [data-tab-title="サービス"] .dt-root thead th:first-child,.dt-tabs [data-tab-title="サービス"] .dt-root tbody tr>th:first-child{width:128px;min-width:128px;max-width:128px}
 
 
 /* 行の高さを低くする：サービスは文字を小さく（最大4行分）、余白も詰める */
@@ -185,3 +184,6 @@
 .dt-tabs [data-tab-title="料金"] td{padding-top:5px;padding-bottom:5px}
 .dt-tabs [data-tab-title="料金"] .dt-p{font-size:13px;line-height:1.4}
 .dt-tabs .dt-root td small.dt-r{display:inline;margin:0 0 0 2px;font-size:11px;line-height:inherit;color:#6b7785}
+/* クリニック列と詳細列の幅は、3つのタブで同じ（固定） */
+.dt-tabs .dt-root thead th:last-child{width:96px;min-width:96px;max-width:96px}
+.dt-tabs .dt-root tbody tr>td:last-child{width:96px;min-width:96px;max-width:96px}
