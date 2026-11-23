@@ -130,12 +130,14 @@
 .dt-tabs .dt-stores li a:hover{background:#f4faff;text-decoration:underline}
 
 /* 料金タブ：ヒゲ3部位〜VIO の4列を同じ幅にして、価格が途中で折り返さないようにする。2026-11-23 */
-.dt-tabs [data-tab-title="料金"] table{table-layout:fixed;min-width:760px}
-.dt-tabs [data-tab-title="料金"] thead th:nth-child(1){width:140px}
-.dt-tabs [data-tab-title="料金"] thead th:nth-child(n+2):nth-child(-n+6){width:calc((100% - 140px - 96px) / 5)}
-.dt-tabs [data-tab-title="料金"] thead th:nth-child(7){width:96px}
-.dt-tabs [data-tab-title="料金"] td{padding:8px 10px;white-space:nowrap}
-.dt-tabs [data-tab-title="料金"] td small{white-space:normal}
+.dt-tabs [data-tab-title^="料金"] table{table-layout:fixed;min-width:560px}
+.dt-tabs [data-tab-title^="料金"] thead th:nth-child(1){width:140px}
+.dt-tabs [data-tab-title="料金（ヒゲ）"] thead th:nth-child(n+2):nth-child(-n+4){width:calc((100% - 140px - 96px) / 3)}
+.dt-tabs [data-tab-title="料金（全身・VIO）"] thead th:nth-child(n+2):nth-child(-n+3){width:calc((100% - 140px - 96px) / 2)}
+.dt-tabs [data-tab-title="料金（ヒゲ）"] thead th:nth-child(5){width:96px}
+.dt-tabs [data-tab-title="料金（全身・VIO）"] thead th:nth-child(4){width:96px}
+.dt-tabs [data-tab-title^="料金"] td{padding:8px 10px;white-space:nowrap}
+.dt-tabs [data-tab-title^="料金"] td small{white-space:normal}
 
 /* 脱毛機の方式バッジ（熱破壊／蓄熱／併用）と、表の下の注釈 */
 .dt-m{margin:0 0 3px;line-height:1.55}
@@ -181,8 +183,8 @@
 .dt-tabs [data-tab-title="サービス"] td{font-size:11.5px;line-height:1.35;padding-left:6px;padding-right:6px}
 .dt-tabs [data-tab-title="サービス"] .dt-m{line-height:1.35;margin:0}
 .dt-tabs [data-tab-title="サービス"] .dt-tag{font-size:9px;line-height:14px;padding:0 5px;margin-top:0}
-.dt-tabs [data-tab-title="料金"] td{padding-top:5px;padding-bottom:5px}
-.dt-tabs [data-tab-title="料金"] .dt-p{font-size:13px;line-height:1.4}
+.dt-tabs [data-tab-title^="料金"] td{padding-top:5px;padding-bottom:5px}
+.dt-tabs [data-tab-title^="料金"] .dt-p{font-size:13px;line-height:1.4}
 .dt-tabs .dt-root td small.dt-r{display:inline;margin:0 0 0 2px;font-size:11px;line-height:inherit;color:#6b7785}
 /* クリニック列と詳細列の幅は、3つのタブで同じ（固定） */
 .dt-tabs .dt-root thead th:last-child{width:96px;min-width:96px;max-width:96px}
