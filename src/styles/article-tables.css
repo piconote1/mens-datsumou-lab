@@ -191,3 +191,11 @@
 /* 各院の紹介のロゴ：記事の幅いっぱいに出す */
 .dt-clogo{margin:0 0 10px}
 .dt-clogo img{display:block;width:100%;height:auto}
+
+/* 回数・費用・期間の目安の表（ヒゲ・全身・VIO × 薄くなる・ツルツル） */
+.dt-root table.dt-count{min-width:0}
+.dt-root table.dt-count thead th{text-align:center;color:#1a78b8;font-size:14px}
+.dt-root table.dt-count tbody th{text-align:center;vertical-align:middle;width:84px;min-width:84px;max-width:84px;font-size:15px}
+.dt-root table.dt-count td{padding:12px 14px;vertical-align:middle}
+.dt-g strong{display:block;margin:0 0 4px;font-size:16px;color:#1f2933}
+.dt-g span{display:block;font-size:13px;line-height:1.7;color:#33404c}
