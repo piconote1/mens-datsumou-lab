@@ -22,7 +22,7 @@ type Group = { slug: string; title: string; featured?: boolean; pinned: string[]
 // 記事ができたら、pinned に slug を並べる（見出しの名前と slug は、管理画面のカテゴリーと同じにする）。
 const GROUPS: Group[] = [
 	{ slug: "select", title: "脱毛を選ぶ", featured: true, pinned: ["clinic-selection-guide", "clinic-compare"] },
-	{ slug: "region", title: "地域で選ぶ", featured: true, pinned: [] },
+	{ slug: "region", title: "地域で選ぶ", featured: true, pinned: ["datsumo-tokyo", "datsumo-osaka", "datsumo-fukuoka", "datsumo-nagoya", "datsumo-sapporo"] },
 	{ slug: "basic", title: "基礎を知る", pinned: ["clinic-vs-salon-guide", "machine-guide", "course-parts-guide"] },
 	{ slug: "money", title: "お金と契約", pinned: ["contract-cancel-guide", "payment-guide", "price-count-guide"] },
 	{ slug: "visit", title: "通う・受ける", pinned: ["pain-skin-guide", "prep-checklist-guide"] },
