@@ -97,11 +97,6 @@ const labelsOf = (id: string) =>
 			<section class="band section home-wrap">
 				<div class="frame">
 					<div class="home-panel">
-						<div class="home-intro">
-							<p>
-								メンズ脱毛研究室は、公式に公開されている情報をもとに、メンズ医療脱毛・ヒゲ脱毛クリニックの料金・脱毛機・条件を並べて比べるサイトです。選び方の基本から、地域別の比較、料金と契約の見方まで、記事ごとに整理しています。
-							</p>
-						</div>
 						{groups.map((g) => (
 							<section class="home-group" aria-label={g.title}>
 								<h2 class="home-section-title">{g.title}</h2>
@@ -155,9 +150,9 @@ const labelsOf = (id: string) =>
 		z-index: 1;
 		background: linear-gradient(
 			95deg,
-			rgba(14, 26, 46, 0.88) 0%,
-			rgba(14, 26, 46, 0.68) 52%,
-			rgba(14, 26, 46, 0.2) 100%
+			rgba(14, 26, 46, 0.82) 0%,
+			rgba(14, 26, 46, 0.56) 42%,
+			rgba(14, 26, 46, 0) 68%
 		);
 		pointer-events: none;
 	}
@@ -287,8 +282,9 @@ const labelsOf = (id: string) =>
 		.hero__scrim {
 			background: linear-gradient(
 				180deg,
-				rgba(14, 26, 46, 0.35) 0%,
-				rgba(14, 26, 46, 0.86) 55%,
+				rgba(14, 26, 46, 0) 0%,
+				rgba(14, 26, 46, 0.48) 28%,
+				rgba(14, 26, 46, 0.86) 58%,
 				rgba(14, 26, 46, 0.94) 100%
 			);
 		}
@@ -303,17 +299,6 @@ const labelsOf = (id: string) =>
 		.hero__img {
 			transition: none;
 		}
-	}
-	.home-intro {
-		margin-bottom: 1.6rem;
-		padding-bottom: 1.4rem;
-		border-bottom: 1px solid #e6e9ed;
-	}
-	.home-intro p {
-		margin: 0;
-		font-size: 0.9375rem;
-		line-height: 1.85;
-		color: #374151;
 	}
 </style>
 
