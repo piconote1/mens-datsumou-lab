@@ -31,23 +31,50 @@ for (const root of roots) {
 		return btn;
 	});
 
+	let mapsActivated = false;
+	const mountMapFrame = (link: HTMLAnchorElement, href: string) => {
+		const frame = document.createElement("iframe");
+		frame.src = href;
+		frame.title = link.textContent?.trim() || "Googleマップ";
+		frame.width = "100%";
+		frame.height = "420";
+		frame.loading = "lazy";
+		frame.referrerPolicy = "no-referrer-when-downgrade";
+		frame.allowFullscreen = true;
+		return frame;
+	};
 	const hydrateMaps = (panel: HTMLElement) => {
 		for (const link of panel.querySelectorAll<HTMLAnchorElement>('a.dt-map-embed[href*="google.com/maps"]')) {
 			const href = link.getAttribute("href");
 			if (!href) continue;
-			const frame = document.createElement("iframe");
-			frame.src = href;
-			frame.title = link.textContent?.trim() || "Googleマップ";
-			frame.width = "100%";
-			frame.height = "420";
-			frame.loading = "lazy";
-			frame.referrerPolicy = "no-referrer-when-downgrade";
-			frame.allowFullscreen = true;
-			link.replaceWith(frame);
+			if (mapsActivated) {
+				link.replaceWith(mountMapFrame(link, href));
+				continue;
+			}
+			const box = link.parentElement;
+			if (!box || box.querySelector(".dt-map-btn")) continue;
+			const label = link.textContent?.trim() || "地図";
+			const wrap = document.createElement("div");
+			wrap.className = "dt-map-facade";
+			const btn = document.createElement("button");
+			btn.type = "button";
+			btn.className = "dt-map-btn";
+			btn.textContent = "地図を表示する";
+			btn.setAttribute("aria-label", `${label}を表示する`);
+			wrap.appendChild(btn);
+			link.hidden = true;
+			box.appendChild(wrap);
+			btn.addEventListener("click", () => {
+				mapsActivated = true;
+				wrap.remove();
+				link.hidden = false;
+				link.replaceWith(mountMapFrame(link, href));
+			});
 		}
 	};
 
 	const show = (index: number) => {
+		if (index !== 0) ensureEqualized();
 		panels.forEach((panel, k) => {
 			panel.hidden = k !== index;
 			buttons[k].setAttribute("aria-selected", String(k === index));
@@ -56,35 +83,58 @@ for (const root of roots) {
 		if (panels[index]) hydrateMaps(panels[index]);
 	};
 
-	root.insertBefore(bar, panels[0]);
-	show(0);
-
 	// 表の高さを、3つのタブで同じにする。タブを切り替えても、下の本文が上下に動かない。
-	// 高さは、いちばん高い表にそろえる（min-height）。ウィンドウ幅や画像の読み込みで変わるので、測り直す。
+	// 初回表示の強制リフローを避けるため、タブを初めて操作したタイミングで1回だけ計測・調整する。
+	let equalized = false;
 	const equalize = () => {
+		const rowSets = panels.map((panel) => Array.from(panel.querySelectorAll<HTMLElement>("tr")));
+		const rowCount = Math.max(0, ...rowSets.map((rows) => rows.length));
+		if (rowCount === 0) return;
+
 		const current = buttons.findIndex((b) => b.getAttribute("aria-selected") === "true");
 		for (const panel of panels) {
 			panel.style.minHeight = "";
 			panel.hidden = false;
 			for (const tr of panel.querySelectorAll<HTMLElement>("tr")) tr.style.height = "";
 		}
-		// 行（見出し行・各クリニックの行）の高さを、3つのタブでそろえる。同じ順番の行は、いちばん高い行にそろえる。
-		const rowSets = panels.map((panel) => Array.from(panel.querySelectorAll<HTMLElement>("tr")));
-		const rowCount = Math.max(...rowSets.map((rows) => rows.length));
+		const heights: number[] = [];
 		for (let i = 0; i < rowCount; i++) {
-			const rows = rowSets.map((set) => set[i]).filter((row): row is HTMLElement => Boolean(row));
-			const h = Math.max(...rows.map((row) => row.getBoundingClientRect().height));
-			for (const row of rows) row.style.height = `${h}px`;
+			let maxH = 0;
+			for (const set of rowSets) {
+				const row = set[i];
+				if (row) {
+					const h = row.getBoundingClientRect().height;
+					if (h > maxH) maxH = h;
+				}
+			}
+			heights.push(maxH);
 		}
-		// 表の下の注釈は、タブごとに長さが違う。注釈の分まで高さをそろえると、下に大きな空白ができるので、そろえない。
+		for (let i = 0; i < rowCount; i++) {
+			const h = heights[i];
+			if (!h) continue;
+			for (const set of rowSets) {
+				const row = set[i];
+				if (row) row.style.height = `${h}px`;
+			}
+		}
 		panels.forEach((panel, k) => {
 			panel.hidden = k !== current;
 		});
 	};
-	equalize();
-	window.addEventListener("load", equalize);
+	const ensureEqualized = () => {
+		if (equalized) return;
+		equalized = true;
+		equalize();
+	};
+
+	root.insertBefore(bar, panels[0]);
+	show(0);
+	for (const ev of ["pointerdown", "touchstart", "focusin"] as const) {
+		bar.addEventListener(ev, ensureEqualized, { once: true, passive: true });
+	}
 	let timer: number | undefined;
 	window.addEventListener("resize", () => {
+		if (!equalized) return;
 		window.clearTimeout(timer);
 		timer = window.setTimeout(equalize, 150);
 	});

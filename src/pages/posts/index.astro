@@ -14,7 +14,7 @@ const {
 	nextCursor,
 } = await getEmDashCollection("posts", {
 	orderBy: { published_at: "desc" },
-	limit: 20,
+	limit: 50,
 	cursor,
 });
 
@@ -33,9 +33,31 @@ const postsWithTags = posts.map((post) => ({
 	post,
 	tags: tagsByEntry.get(post.data.id) ?? [],
 }));
+const postsUrl = `${Astro.url.origin}/posts`;
+const postsDescription = "メンズ医療脱毛・ヒゲ脱毛クリニックの料金比較・脱毛機の種類・契約の注意点・地域別比較など、すべての公開記事を新しい順にまとめた一覧です。";
+const postsSchema = {
+	"@context": "https://schema.org",
+	"@type": "CollectionPage",
+	"@id": `${postsUrl}#webpage`,
+	url: postsUrl,
+	name: "記事一覧 | メンズ脱毛研究室",
+	description: postsDescription,
+	inLanguage: "ja",
+	isPartOf: { "@id": `${Astro.url.origin}/#website` },
+	about: { "@id": `${Astro.url.origin}/#organization` },
+};
 ---
 
-<Base title="記事一覧" description="記事の一覧です">
+<Base
+	title="記事一覧"
+	description={postsDescription}
+	canonical={cursor ? `${postsUrl}?cursor=${encodeURIComponent(cursor)}` : postsUrl}
+	breadcrumbs={[
+		{ name: "ホーム", url: "/" },
+		{ name: "記事一覧", url: "/posts" },
+	]}
+	schema={postsSchema}
+>
 	<header class="band intro">
 		<div class="frame">
 			<h1 class="intro__title">記事一覧</h1>
@@ -67,9 +89,9 @@ const postsWithTags = posts.map((post) => ({
 				) : (
 					<>
 						<ol class="post-list">
-							{postsWithTags.map(({ post, tags }) => (
+							{postsWithTags.map(({ post, tags }, i) => (
 								<li>
-									<PostRow post={post} labels={tags} />
+									<PostRow post={post} labels={tags} headingLevel={2} priority={i === 0} />
 								</li>
 							))}
 						</ol>

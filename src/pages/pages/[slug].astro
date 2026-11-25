@@ -24,20 +24,67 @@ if (!page) {
 
 if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 const { siteShortTitle } = resolveBlogSiteIdentity(await getSiteSettings());
+const pageOrigin = Astro.url.origin;
+const pageUrl = `${pageOrigin}/pages/${slug}`;
+const PAGE_DESCRIPTIONS: Record<string, string> = {
+	operator: "メンズ脱毛研究室の運営者情報（運営者けんと・連絡先・運営方針・医療情報に関するスタンス）を掲載しています。",
+	privacy: "メンズ脱毛研究室のプライバシーポリシー（お問い合わせ時の個人情報・アクセス解析・Cloudflare利用・免責）を定めています。",
+	disclaimer: "メンズ脱毛研究室におけるアフィリエイト広告の表記方針、医療・健康情報の免責事項、掲載情報の正確性について案内しています。",
+};
 const seo = getSeoMeta(page, {
 	siteTitle: siteShortTitle,
-	siteUrl: Astro.url.origin,
+	siteUrl: pageOrigin,
 	path: Astro.url.pathname.replace(/\/$/, ""),
 });
+const resolvedDescription = seo.description || PAGE_DESCRIPTIONS[slug] || `${page.data.title} | ${siteShortTitle}`;
+const pageSchema: Record<string, unknown> =
+	slug === "operator"
+		? {
+				"@context": "https://schema.org",
+				"@type": "ProfilePage",
+				"@id": `${pageUrl}#webpage`,
+				url: pageUrl,
+				name: seo.title,
+				description: resolvedDescription,
+				inLanguage: "ja",
+				isPartOf: { "@id": `${pageOrigin}/#website` },
+				about: { "@id": `${pageOrigin}/#organization` },
+				dateModified: page.data.updatedAt.toISOString(),
+				mainEntity: {
+					"@type": "Person",
+					"@id": `${pageUrl}#person`,
+					name: "けんと",
+					url: pageUrl,
+					sameAs: ["https://www.threads.com/@kento.datsumou"],
+					worksFor: { "@id": `${pageOrigin}/#organization` },
+				},
+			}
+		: {
+				"@context": "https://schema.org",
+				"@type": "WebPage",
+				"@id": `${pageUrl}#webpage`,
+				url: pageUrl,
+				name: seo.title,
+				description: resolvedDescription,
+				inLanguage: "ja",
+				isPartOf: { "@id": `${pageOrigin}/#website` },
+				about: { "@id": `${pageOrigin}/#organization` },
+				dateModified: page.data.updatedAt.toISOString(),
+			};
 ---
 
 <Base
 	title={seo.title}
 	pageTitle={seo.ogTitle}
-	description={seo.description}
+	description={resolvedDescription}
 	canonical={seo.canonical}
 	robots={seo.robots}
 	content={{ collection: "pages", id: page.data.id, slug }}
+	breadcrumbs={[
+		{ name: "ホーム", url: "/" },
+		{ name: page.data.title, url: `/pages/${slug}` },
+	]}
+	schema={pageSchema}
 >
 	<article class="band page">
 		<div class="frame page__layout">

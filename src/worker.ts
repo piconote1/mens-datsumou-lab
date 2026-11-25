@@ -33,6 +33,24 @@ export default {
 		if (url.pathname === "/sitemap-index.xml") {
 			return new Response("Not found", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8" } });
 		}
+		const isLocal = LOCAL_HOST.test(url.hostname);
+		const isPublicGetHtml =
+			request.method === "GET" &&
+			!isLocal &&
+			!url.pathname.startsWith("/_emdash/") &&
+			!url.pathname.startsWith("/search") &&
+			!request.headers.get("cookie");
+		const edgeCache = isPublicGetHtml ? (caches as unknown as { default: Cache }).default : null;
+		const edgeCacheKey = isPublicGetHtml ? new Request(url.toString(), { method: "GET" }) : null;
+		if (edgeCache && edgeCacheKey) {
+			const cached = await edgeCache.match(edgeCacheKey);
+			if (cached) {
+				const hitHeaders = new Headers(cached.headers);
+				hitHeaders.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
+				hitHeaders.set("X-Worker-Cache", "HIT");
+				return new Response(cached.body, { status: cached.status, statusText: cached.statusText, headers: hitHeaders });
+			}
+		}
 		const res = await (handler as { fetch: (r: Request, e: unknown, c: ExecutionContext) => Promise<Response> }).fetch(
 			request,
 			env,
@@ -64,13 +82,15 @@ export default {
 			}
 		}
 		// ヘッダーの追加（2026-11-20）。本番（https）のときだけ。転送（3xx）と WebSocket には付けない。
-		if (LOCAL_HOST.test(url.hostname) || res.status === 101 || (res.status >= 300 && res.status < 400)) return res;
+		if (res.status === 101 || (res.status >= 300 && res.status < 400)) return res;
 		const headers = new Headers(res.headers);
-		// HSTS: https だけで使うよう、ブラウザに記憶させる。サブドメインにも適用する（2026-11-21。使っているサブドメインは www のみで、https で動く）。
-		headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-		// 画像などのメディアは、ファイル名（ID）が変わらない限り中身が変わらない。長く保存してよい。
-		if (url.pathname.startsWith("/_emdash/api/media/file/") && res.status === 200) {
-			headers.set("Cache-Control", "public, max-age=31536000, immutable");
+		if (!isLocal) {
+			// HSTS: https だけで使うよう、ブラウザに記憶させる。サブドメインにも適用する（2026-11-21。使っているサブドメインは www のみで、https で動く）。
+			headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+			// 画像などのメディアは、ファイル名（ID）が変わらない限り中身が変わらない。長く保存してよい。
+			if (url.pathname.startsWith("/_emdash/api/media/file/") && res.status === 200) {
+				headers.set("Cache-Control", "public, max-age=31536000, immutable");
+			}
 		}
 		// サイトマップ（記事・固定ページ）の更新日時から、ミリ秒を外す（2026-11-21）。EmDash 本体が出す形（….103Z）を、秒まで（…Z）にそろえる。
 		if (/^\/sitemap-(posts|pages)\.xml$/.test(url.pathname) && request.method === "GET" && res.status === 200) {
@@ -81,11 +101,11 @@ export default {
 		}
 		const isHtml = (res.headers.get("content-type") ?? "").includes("text/html");
 		const isPublicPage = isHtml && (request.method === "GET" || request.method === "HEAD") && !url.pathname.startsWith("/_emdash/");
-		if (isPublicPage) {
+		if (isPublicPage && !isLocal) {
 			// 公開ページの HTML（2026-11-21）。ログインしている人（Cookie あり）の画面は対象外。
-			// ブラウザは毎回確認し、エッジ（Cloudflare）は60秒だけ保存してよい、という指定。記事を直したら、すぐ反映される。
+			// ブラウザは毎回確認し、エッジ（Cloudflare）は300秒保存してよい、という指定。
 			if (res.status === 200 && !request.headers.get("cookie") && !headers.has("cache-control")) {
-				headers.set("Cache-Control", "public, max-age=0, s-maxage=60");
+				headers.set("Cache-Control", "public, max-age=0, s-maxage=300, stale-while-revalidate=86400");
 			}
 			// CSP は、まず「報告だけ」の形で付ける（表示は止めない）。違反があればブラウザのコンソールに出るので、後で本番の形にできる。
 			headers.set(
@@ -98,34 +118,51 @@ export default {
 		// EmDash の本体は、出版者を名前だけ、著者を人物の形で出す。ここで、組織情報（ロゴつき）を指す形に書き換える。
 		if (isPublicPage && res.status === 200) {
 			const orgId = `${url.origin}/#organization`;
+			const websiteId = `${url.origin}/#website`;
 			const isPost = url.pathname.startsWith("/posts/");
 			let buf = "";
 			const rewriter = new HTMLRewriter();
-			if (isPost) {
-				rewriter.on('script[type="application/ld+json"]', {
-					text(chunk) {
-						buf += chunk.text;
-						if (!chunk.lastInTextNode) {
-							chunk.remove();
-							return;
+			rewriter.on("input.emdash-live-search-input", {
+				element(el) {
+					if (!el.getAttribute("aria-label")) {
+						el.setAttribute("aria-label", "サイト内を検索");
+					}
+				},
+			});
+			rewriter.on('script[type="application/ld+json"]', {
+				text(chunk) {
+					buf += chunk.text;
+					if (!chunk.lastInTextNode) {
+						chunk.remove();
+						return;
+					}
+					let outText = buf;
+					try {
+						const j = JSON.parse(buf);
+						if (j && j["@type"] === "WebSite") {
+							j.url = `${url.origin}/`;
+							j.inLanguage = "ja";
+							j.publisher = { "@id": orgId };
+							j.potentialAction = {
+								"@type": "SearchAction",
+								target: `${url.origin}/search?q={search_term_string}`,
+								"query-input": "required name=search_term_string",
+							};
+							outText = JSON.stringify(j).replace(/</g, "\\u003c");
+						} else if (isPost && j && j["@type"] === "BlogPosting") {
+							j.author = { "@type": "Organization", "@id": orgId, name: j.author?.name ?? "メンズ脱毛研究室" };
+							j.publisher = { "@id": orgId };
+							j.isPartOf = { "@id": websiteId };
+							j.inLanguage = "ja";
+							outText = JSON.stringify(j).replace(/</g, "\\u003c");
 						}
-						let outText = buf;
-						try {
-							const j = JSON.parse(buf);
-							if (j && j["@type"] === "BlogPosting") {
-								j.author = { "@type": "Organization", "@id": orgId, name: j.author?.name ?? "メンズ脱毛研究室" };
-								j.publisher = { "@id": orgId };
-								j.inLanguage = "ja";
-								outText = JSON.stringify(j).replace(/</g, "\\u003c");
-							}
-						} catch {
-							// 解析できなければ、元のまま出す
-						}
-						buf = "";
-						chunk.replace(outText, { html: true });
-					},
-				});
-			}
+					} catch {
+						// 解析できなければ、元のまま出す
+					}
+					buf = "";
+					chunk.replace(outText, { html: true });
+				},
+			});
 			// 画像の srcset（どの幅でも同じファイルを指していた）を、幅ごとに縮小した画像（?w=幅）を指すよう書き換える。
 			// EmDash 本体は、srcset を出したり出さなかったりする（安定しない）ため、
 			// srcset がない画像（記事の画像・サムネイル）には、こちらで、幅ごとの縮小版を指す srcset を付ける。
@@ -136,7 +173,7 @@ export default {
 					if (!srcset) {
 						const src = el.getAttribute("src");
 						const natural = Number(el.getAttribute("width")) || 0;
-						if (!src || !el.getAttribute("sizes") || natural < 700) return;
+						if (!src) return;
 						let path = "";
 						try {
 							const parsed = new URL(src, url.origin);
@@ -145,8 +182,20 @@ export default {
 						} catch {
 							return;
 						}
-						const widths = [320, 480, 640, 800, 960, 1280].filter((w) => w < natural);
-						el.setAttribute("srcset", [...widths.map((w) => `${path}?w=${w} ${w}w`), `${path} ${natural}w`].join(", "));
+						if (el.getAttribute("sizes") && natural >= 700) {
+							const widths = [320, 480, 640, 800, 960, 1280].filter((w) => w < natural);
+							el.setAttribute("srcset", [...widths.map((w) => `${path}?w=${w} ${w}w`), `${path} ${natural}w`].join(", "));
+						} else if (natural > 0 && natural <= 400) {
+							// 比較表のクリニックロゴ（112px）や順位バッジ（24px）など小さい固定幅画像の縮小配信
+							const targetW = Math.max(100, Math.min(480, natural * 2));
+							el.setAttribute("src", `${path}?w=${targetW}`);
+						} else if (url.pathname === "/pages/operator" && el.getAttribute("loading") === "lazy") {
+							el.setAttribute("loading", "eager");
+							if (natural >= 400) {
+								el.setAttribute("srcset", `${path}?w=320 320w, ${path} ${natural}w`);
+								el.setAttribute("sizes", "160px");
+							}
+						}
 						return;
 					}
 					const parts = srcset.split(",").map((p) => p.trim()).filter(Boolean);
@@ -175,7 +224,18 @@ export default {
 					el.setAttribute("srcset", [...extra, ...next].join(", "));
 				},
 			});
-			return rewriter.transform(out);
+			const transformed = rewriter.transform(out);
+			if (edgeCache && edgeCacheKey && !headers.has("set-cookie")) {
+				const ch = new Headers(transformed.headers);
+				ch.set("Cache-Control", "public, max-age=300");
+				const forCache = new Response(transformed.clone().body, {
+					status: transformed.status,
+					statusText: transformed.statusText,
+					headers: ch,
+				});
+				ctx.waitUntil(edgeCache.put(edgeCacheKey, forCache));
+			}
+			return transformed;
 		}
 		return out;
 	},

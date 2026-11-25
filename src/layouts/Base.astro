@@ -32,6 +32,8 @@ interface Props {
 	content?: { collection: string; id: string; slug?: string | null };
 	/** パンくず（構造化データ用）。先頭から順に、ホーム → 上位 → このページ */
 	breadcrumbs?: { name: string; url: string }[] | null;
+	/** ページ固有の追加 JSON-LD（ProfilePage / WebPage / CollectionPage など） */
+	schema?: Record<string, unknown> | Record<string, unknown>[] | null;
 }
 
 const {
@@ -47,6 +49,7 @@ const {
 	author,
 	content,
 	breadcrumbs,
+	schema,
 } = Astro.props;
 const [settingsResult, menuResult] = await Promise.all([
 	getSiteSettingsWithCacheHint(),
@@ -76,6 +79,9 @@ const menuItems = menu?.items ?? [];
 const footerMenuResult = await getMenuWithCacheHint("footer");
 const footerMenuItems = footerMenuResult.data?.items ?? menuItems;
 
+const siteOrigin = Astro.url.origin;
+const resolvedImage = image ?? `${siteOrigin}/brand/og-default.png`;
+
 // Build public page context for plugin contributions
 // SEO data is passed here and rendered securely by EmDashHead
 const pageCtx = createPublicPageContext({
@@ -86,16 +92,15 @@ const pageCtx = createPublicPageContext({
 	pageTitle: pageTitle ?? title,
 	description,
 	canonical,
-	image,
+	image: resolvedImage,
 	content,
-	seo: { ogImage: image, robots },
+	seo: { ogImage: resolvedImage, robots },
 	articleMeta: { publishedTime, modifiedTime, author },
 	siteName: siteTitle,
 });
 
 // 構造化データ（2026-11-20 追加）: 運営者（Organization、ロゴつき）と、パンくず（BreadcrumbList）。
 // 記事の BlogPosting は EmDash の本体が出すので、ここでは重ねない。
-const siteOrigin = Astro.url.origin;
 const extraJsonLd: Record<string, unknown>[] = [
 	{
 		"@context": "https://schema.org",
@@ -105,6 +110,12 @@ const extraJsonLd: Record<string, unknown>[] = [
 		alternateName: siteTitle,
 		sameAs: ["https://www.threads.com/@kento.datsumou"],
 		url: `${siteOrigin}/`,
+		foundingDate: "2026-11",
+		contactPoint: {
+			"@type": "ContactPoint",
+			email: "contact@mens-datsumou-lab.com",
+			contactType: "editorial",
+		},
 		description: "公式に公開されている情報をもとに、メンズ医療脱毛・ヒゲ脱毛クリニックの料金・脱毛機・条件を比べて整理するサイトです。",
 		logo: { "@type": "ImageObject", url: `${siteOrigin}/brand/icon-512.png`, width: 512, height: 512 },
 	},
@@ -120,6 +131,9 @@ if (breadcrumbs && breadcrumbs.length > 1) {
 			item: b.url.startsWith("http") ? b.url : `${siteOrigin}${b.url}`,
 		})),
 	});
+}
+if (schema) {
+	extraJsonLd.push(...(Array.isArray(schema) ? schema : [schema]));
 }
 
 // Check if user is logged in (for showing admin link)
@@ -217,8 +231,7 @@ const GA_ID = "G-ZN27GERM2B";
 				if (opened && !(t && t.closest && t.closest('.site-nav li.has-sub'))) opened.classList.remove('open');
 			});
 		</script>
-		<!-- フォントの先読み（preload）は付けない。日本語フォントは、文字の範囲ごとに約120個に分かれていて、先読みすると全部（約5MB）を毎回読み込んでしまう（2026-11-21）。使う文字の分だけ、ブラウザが読み込む。 -->
-		<Font cssVariable="--font-body" />
+		<!-- 日本語本文は端末標準ゴシック（theme.css）を使い、Noto Sans JP の約120個・~190KB のインライン @font-face を省く -->
 		<Font cssVariable="--font-mono" />
 		<script>import "../scripts/table-fullscreen";</script>
 		<script>import "../scripts/map-facade";</script>
@@ -259,18 +272,26 @@ const GA_ID = "G-ZN27GERM2B";
 						siteLogo ? (
 							<img
 								src={siteLogo.url}
+								srcset={
+									siteLogo.url?.startsWith("/_emdash/api/media/file/")
+										? `${siteLogo.url}?w=320 320w, ${siteLogo.url}?w=480 480w, ${siteLogo.url}?w=640 640w, ${siteLogo.url} 936w`
+										: undefined
+								}
+								sizes="(max-width: 600px) 240px, 312px"
 								alt={siteLogo.alt || siteTitle}
 								class="brand__logo"
+								width="312"
+								height="104"
 							/>
 						) : (
 							<>
-								<img src="/brand/logo.webp" alt={siteTitle} class="brand__logo-img" width="1200" height="235" />
+								<img src="/brand/logo-600.webp" srcset="/brand/logo-600.webp 600w, /brand/logo.webp 1200w" sizes="(max-width: 600px) 240px, 333px" alt={siteTitle} class="brand__logo-img" width="1200" height="235" />
 							</>
 						)
 					}
 				</a>
 				<div class="site-header__actions">
-					<div class="site-search" role="search" aria-label="Site">
+					<div class="site-search" role="search" aria-label="サイト内検索">
 						<svg
 							class="site-search__icon"
 							viewBox="0 0 24 24"
@@ -372,17 +393,15 @@ const GA_ID = "G-ZN27GERM2B";
 			</div>
 		</header>
 		<script is:inline>
-			// Inline, so the height is set before the browser scrolls to a URL fragment
+			// ResizeObserver でヘッダー高さを反映（初回同期 offsetHeight による強制リフローを回避）
 			(function () {
 				var header = document.querySelector(".site-header");
-				function setHeight() {
-					document.documentElement.style.setProperty(
-						"--header-height",
-						header.offsetHeight + "px",
-					);
-				}
-				setHeight();
-				new ResizeObserver(setHeight).observe(header);
+				if (!header) return;
+				new ResizeObserver(function (entries) {
+					var entry = entries[0];
+					var h = (entry && entry.borderBoxSize && entry.borderBoxSize[0] && entry.borderBoxSize[0].blockSize) || header.offsetHeight;
+					document.documentElement.style.setProperty("--header-height", Math.round(h) + "px");
+				}).observe(header);
 			})();
 		</script>
 
