@@ -68,6 +68,7 @@ const { siteTitle, siteShortTitle, siteTagline, siteLogo } = resolveBlogSiteIden
 const titleIncludesSiteName =
 	title === siteTitle ||
 	title === siteShortTitle ||
+	title.startsWith(`${siteShortTitle}｜`) ||
 	title.endsWith(` | ${siteTitle}`) ||
 	title.endsWith(` — ${siteTitle}`) ||
 	title.endsWith(` | ${siteShortTitle}`) ||
@@ -196,7 +197,7 @@ const GA_ID = "G-ZN27GERM2B";
 						['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(function (ev) {
 							window.addEventListener(ev, load, { once: true, passive: true });
 						});
-						window.addEventListener('load', function () { setTimeout(load, 3500); });
+						window.addEventListener('load', function () { setTimeout(load, 5500); });
 					})();
 					// 記事の中の「公式サイトを詳しく見る」ボタン（外部リンク）が押された回数を、
 					// GA4 のイベント official_click として記録する。院名は clinic、押された記事は page_path。
@@ -237,6 +238,14 @@ const GA_ID = "G-ZN27GERM2B";
 		<script>import "../scripts/map-facade";</script>
 		<script>import "../scripts/dt-tabs";</script>
 		<title>{fullTitle}</title>
+		<script
+			type="speculationrules"
+			is:inline
+			set:html={JSON.stringify({
+				prefetch: [{ where: { and: [{ href_matches: "/*" }, { not: { href_matches: "/_emdash/*" } }, { not: { href_matches: "/search*" } }] }, eagerness: "moderate" }],
+				prerender: [{ where: { and: [{ href_matches: "/posts/*" }, { not: { href_matches: "/_emdash/*" } }] }, eagerness: "moderate" }],
+			})}
+		/>
 		<link rel="icon" href="/favicon.png" type="image/png" />
 		<EmDashHead page={pageCtx} />
 		<meta property="og:locale" content="ja_JP" />

@@ -81,6 +81,11 @@ body {
 	content-visibility: auto;
 	contain-intrinsic-size: auto 420px;
 }
+.post-related,
+footer.site-footer[class] {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 280px;
+}
 /* 見出し・タイトルは、文節ではなく、行いっぱいに文字を詰めて折り返す */
 h1,
 h2,

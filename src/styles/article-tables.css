@@ -247,3 +247,6 @@
 .dt-map-tabs .dt-tabs__tab{padding:9px 2px;font-size:12px}
 .dt-map-panel{padding:10px}
 .dt-map-box,.dt-map-box iframe,.dt-map-box a.dt-map-embed,.dt-map-facade{min-height:340px;height:340px}}
+/* 大型比較記事・地域記事のモバイル初期TBT削減: 画面外タブパネル・下層詳細ブロックのレイアウト計算を遅延 */
+.dt-tabs > [data-tab-title]:nth-of-type(n + 2){content-visibility:auto;contain-intrinsic-size:auto 520px}
+.prose > .emdash-html-block:nth-of-type(n + 4){contain:layout style}
